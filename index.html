@@ -116,7 +116,7 @@ table.grid td.n { font-family: var(--display); font-weight: 800; font-size: 22px
 table.grid td.step { font-weight: 700; width: 120px; }
 table.grid td.tag { width: 200px; }
 
-/* Ruled rows (Firefly, channel deep dives) */
+/* Ruled rows (Claude, channel deep dives) */
 .rows { display: flex; flex-direction: column; }
 .row { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 6px 32px; padding-block: 20px; border-bottom: 1px solid var(--line); }
 .row > .spec { padding-top: 4px; }
@@ -288,13 +288,13 @@ table.grid.slim td.src { width: 160px; font-family: var(--mono); font-size: 12px
 /* the job: colored step numbers */
 table.grid td.n span { display: inline-grid; place-items: center; width: 40px; height: 40px; background: var(--bg); color: var(--fg); font-size: 20px; }
 
-/* firefly band */
-#firefly.band-c { position: relative; overflow: hidden; padding-block: 104px 104px; margin-top: 104px; }
-#firefly .halftone { left: -30px; top: -30px; width: 380px; height: 300px; opacity: .35;
+/* Claude band */
+#claude.band-c { position: relative; overflow: hidden; padding-block: 104px 104px; margin-top: 104px; }
+#claude .halftone { left: -30px; top: -30px; width: 380px; height: 300px; opacity: .35;
   -webkit-mask-image: radial-gradient(circle at 0 0, #000 15%, transparent 70%); mask-image: radial-gradient(circle at 0 0, #000 15%, transparent 70%); }
-#firefly .wrap { position: relative; }
-#firefly .verify { background: var(--k); color: var(--yellow); padding: 2px 6px; }
-#firefly .sec-head { border-bottom-width: 3px; }
+#claude .wrap { position: relative; }
+#claude .verify { background: var(--k); color: var(--yellow); padding: 2px 6px; }
+#claude .sec-head { border-bottom-width: 3px; }
 
 /* channels: a colored slab per channel */
 .chan-id { background: var(--slab); color: var(--slab-ink); padding: 28px 24px 24px; box-shadow: 8px 8px 0 var(--k); border: 2px solid var(--k); }
@@ -500,7 +500,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
       Spot the Machine
     </a>
     <div class="links" id="links">
-      <a href="#firefly" data-for="firefly">Firefly</a>
+      <a href="#claude" data-for="claude">Claude</a>
       <a href="#channels" data-for="channels">Channels</a>
       <a href="#outlook" data-for="outlook">Outlook</a>
       <a href="#test" data-for="test" class="go">Voting</a>
@@ -528,7 +528,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
       <dl>
         <div class="r"><dt>Question</dt><dd>How does AI change marketing work by 2031?</dd></div>
         <div class="r"><dt>Domain</dt><dd>Marketing, in six channels</dd></div>
-        <div class="r"><dt>Tool tested</dt><dd>Adobe Firefly</dd></div>
+        <div class="r"><dt>Tool tested</dt><dd>Claude, by Anthropic</dd></div>
         <div class="r"><dt>Team</dt><dd id="docketTeam"></dd></div>
         <div class="r"><dt>Deliverable</dt><dd>This site, and two ads</dd></div>
       </dl>
@@ -539,12 +539,12 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
 
 <div class="ticker" aria-hidden="true"><div class="ticker-track" id="ticker"></div></div>
 
-<section class="band-c" id="firefly" aria-labelledby="ff-h">
+<section class="band-c" id="claude" aria-labelledby="ff-h">
   <div class="halftone" aria-hidden="true"></div>
   <div class="wrap">
     <div class="sec-head rv">
-      <h2 id="ff-h">The tool we tested: Adobe Firefly.</h2>
-      <p class="lead">Adobe's image generator, sold to brands as safe for commercial use. We used it to make one of the two ads at the end of this page.</p>
+      <h2 id="ff-h">The tool we tested: Claude.</h2>
+      <p class="lead">Anthropic's AI assistant. We used it to research, plan and build this entire site. The AI ad at the end came from Adobe Firefly, because Claude doesn't make photographs.</p>
     </div>
     <div class="rows" id="ffRows"></div>
   </div>
@@ -611,12 +611,13 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
       <div><p>DMD 2030 final project, UConn Stamford. Researched by the six of us; built with Claude and Adobe Firefly.</p></div>
       <div><h4>Team</h4><ul id="team"></ul></div>
       <div><h4>Sections</h4><ul>
-        <li><a href="#firefly">Firefly</a></li><li><a href="#channels">Channels</a></li>
+        <li><a href="#claude">Claude</a></li><li><a href="#channels">Channels</a></li>
         <li><a href="#outlook">Outlook</a></li><li><a href="#test">Voting</a></li></ul></div>
       <div><h4>Sources</h4><ul>
         <li><a href="https://investor.forrester.com/news-releases/news-release-details/forrester-nine-10-us-marketing-agencies-use-ai-cut-costs-expense" target="_blank" rel="noopener">Forrester × 4As, 2026</a></li>
         <li><a href="https://supermetrics.com/blog/ai-marketing-statistics" target="_blank" rel="noopener">Canva, via Supermetrics</a></li>
         <li><a href="https://jasper.ai/state-of-ai-marketing-2026" target="_blank" rel="noopener">Jasper, 2026</a></li>
+        <li><a href="https://support.anthropic.com/en/articles/9945697-claude-for-marketing" target="_blank" rel="noopener">Claude for marketing, Anthropic</a></li>
       </ul></div>
     </div>
   </div>
@@ -636,12 +637,19 @@ const ADS = [
     maker: "[Who made it]", how: "[How it was made: photo, layout, tools, time it took]" }
 ];
 
-const FIREFLY = [
-  { k: "What it is", v: ["Adobe's family of generative AI models for images, built into Photoshop, Illustrator, Express and its own web app."], verify: true },
-  { k: "Trained on", v: ["Adobe says Firefly is trained on licensed content such as Adobe Stock, plus public-domain work, and markets it as safe for commercial use."], verify: true },
-  { k: "Labeling", v: ["Images can carry Content Credentials, a record that says AI was used to make them."], verify: true },
-  { k: "What we tested", v: ["[What we asked it to make, how many tries it took, and what it got wrong]"] },
-  { k: "Where it fell short", v: ["[What it refused, flattened or could not do without a person fixing it]"] }
+const PLATFORM = [
+  { k: "What it is", v: ["Anthropic's AI assistant. The current models are Claude Opus 5.5, Sonnet 5.5 and Haiku 5.5.",
+    "It runs on the web, desktop and phone, and inside tools marketers already use: Chrome, Slack, Microsoft 365 and Google Workspace."] },
+  { k: "What it does for marketers", v: ["Writes and edits copy, researches with live web search, and analyzes data.",
+    "It also builds finished work: documents, slide decks, dashboards and web pages. Projects keep a team's files and instructions in one place."] },
+  { k: "How it changes the job", v: ["First drafts, research summaries and page builds move to the AI.",
+    "The marketer's work shifts to writing the brief, judging what comes back, and fixing what's wrong."] },
+  { k: "What we tested", v: ["We used Claude for the whole project: finding the industry reports we cite, planning the work across six people, drafting the channel templates, and building this site, vote included.",
+    "Every line of code on this page was written by Claude. Every decision about what it should say and look like was ours."] },
+  { k: "Where it fell short", v: ["It can't make photographs, so the AI ad came from Adobe Firefly.",
+    "Its first designs looked like every other AI-made site. It took many rounds of our direction on color, fonts, layout and which sections to keep to get here.",
+    "It couldn't confirm every number: one report is behind a paywall, and one statistic came from a secondhand source.",
+    "Its drafts sounded right but were generic. The real roles and examples came from our own research."] }
 ];
 
 const CHANNELS = [
@@ -721,7 +729,7 @@ function renderStatic() {
   document.getElementById("team").replaceChildren(...people.map(who => el("li", { text: who + ", " + CHANNELS.filter(c => c.owner === who).map(c => c.name).join(" and ") })));
 
 
-  document.getElementById("ffRows").replaceChildren(...FIREFLY.map((r, i) => el("div", { class: "row rv", style: "--d:" + i },
+  document.getElementById("ffRows").replaceChildren(...PLATFORM.map((r, i) => el("div", { class: "row rv", style: "--d:" + i },
     el("span", { class: "spec", text: r.k }),
     el("div", {}, r.v.map(v => el("p", { class: isTodo(v) ? "todo" : "" }, v, r.verify ? el("span", { class: "verify", text: "check current" }) : null))))));
 
@@ -844,7 +852,7 @@ function watch() {
   if (!("IntersectionObserver" in window)) return;
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -15% 0px" });
   targets.forEach(t => io.observe(t));
-  const groups = ["firefly", "channels", "outlook", "test"];
+  const groups = ["claude", "channels", "outlook", "test"];
   const spy = new IntersectionObserver(es => es.forEach(e => {
     if (!e.isIntersecting) return;
     const id = groups.includes(e.target.id) ? e.target.id : null;
