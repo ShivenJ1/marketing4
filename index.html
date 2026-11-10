@@ -504,7 +504,6 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
       <a href="#firefly" data-for="firefly">Firefly</a>
       <a href="#channels" data-for="channels">Channels</a>
       <a href="#outlook" data-for="outlook">Outlook</a>
-      <a href="#consequences" data-for="consequences">Consequences</a>
       <a href="#test" data-for="test" class="go">Voting</a>
     </div>
   </div>
@@ -593,16 +592,6 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
   </div>
 </section>
 
-<section class="band-k" id="consequences" aria-labelledby="cq-h">
-  <div class="wrap">
-    <div class="sec-head rv">
-      <h2 id="cq-h">What nobody planned for.</h2>
-      <p class="lead">Unintended outcomes for the people who do this work: their roles, their ethics, and how they see themselves.</p>
-    </div>
-    <div class="cons" id="cons"></div>
-  </div>
-</section>
-
 <section class="test" id="test" aria-labelledby="test-h">
   <div class="halftone" aria-hidden="true"></div>
   <div class="wrap">
@@ -640,7 +629,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
       <div><h4>Team</h4><ul id="team"></ul></div>
       <div><h4>Sections</h4><ul>
         <li><a href="#job">The job</a></li><li><a href="#firefly">Firefly</a></li><li><a href="#channels">Channels</a></li>
-        <li><a href="#outlook">Outlook</a></li><li><a href="#consequences">Consequences</a></li><li><a href="#test">Voting</a></li></ul></div>
+        <li><a href="#outlook">Outlook</a></li><li><a href="#test">Voting</a></li></ul></div>
       <div><h4>Sources</h4><ul>
         <li><a href="https://investor.forrester.com/news-releases/news-release-details/forrester-nine-10-us-marketing-agencies-use-ai-cut-costs-expense" target="_blank" rel="noopener">Forrester × 4As, 2026</a></li>
         <li><a href="https://supermetrics.com/blog/ai-marketing-statistics" target="_blank" rel="noopener">Canva, via Supermetrics</a></li>
@@ -727,14 +716,6 @@ const OUTLOOK = [
     rows: THEMES.map(t => ({ t, v: "[What could happen]", s: "[Source]" })) }
 ];
 
-const CONSEQUENCES = [
-  { q: "Who does the work now?", d: "Which tasks move from makers to directors, and which jobs shrink." },
-  { q: "Which skills still matter?", d: "Taste, briefing and judgment, versus hands-on production." },
-  { q: "Who is responsible?", d: "Bias, accuracy and disclosure when a model makes the ad." },
-  { q: "Who owns the output?", d: "Copyright, training data, and credit for AI-made work." },
-  { q: "Who gets left out?", d: "Entry-level jobs, small studios, and access to paid tools." },
-  { q: "How does it feel?", d: "What it does to a creative's sense of craft and identity." }
-].map(c => ({ ...c, finding: "[A real case, with its source]" }));
 
 /* ============ Rendering ============ */
 const isTodo = x => typeof x === "string" && x.startsWith("[");
@@ -788,8 +769,6 @@ function renderStatic() {
       el("thead", {}, el("tr", {}, el("th", { text: "Theme" }), el("th", { text: "What could happen" }), el("th", { text: "Source" }))),
       el("tbody", {}, o.rows.map(r => el("tr", {}, cell(r.t, "theme"), cell(r.v), cell(r.s, "src")))))) : null)));
 
-  document.getElementById("cons").replaceChildren(...CONSEQUENCES.map((c, i) => el("div", { class: "con rv", style: "--d:" + (i % 2) },
-    el("h3", { text: c.q }), el("p", { text: c.d }), txt(c.finding))));
 }
 
 function channel(c, i) {
@@ -894,7 +873,7 @@ function watch() {
   if (!("IntersectionObserver" in window)) return;
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -15% 0px" });
   targets.forEach(t => io.observe(t));
-  const groups = ["job", "firefly", "channels", "outlook", "consequences", "test"];
+  const groups = ["job", "firefly", "channels", "outlook", "test"];
   const spy = new IntersectionObserver(es => es.forEach(e => {
     if (!e.isIntersecting) return;
     const id = groups.includes(e.target.id) ? e.target.id : null;
