@@ -185,7 +185,7 @@ table.grid.slim td.src { width: 160px; font-family: var(--mono); font-size: 12px
 .test-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; margin-top: 48px; }
 .proof-fig { margin: 0; max-width: 480px; width: 100%; justify-self: center; }
 .proof { position: relative; padding: 22px; }
-.proof-fig > .spec { display: block; padding: 0 22px; }
+.proof-fig > .spec { display: block; padding: 0 22px; margin-top: 6px; }
 .cm { position: absolute; width: 22px; height: 22px; }
 .cm::before, .cm::after { content: ""; position: absolute; background: var(--ink); }
 .cm::before { width: 14px; height: 1px; }
@@ -354,6 +354,52 @@ table.grid td.n span { display: inline-grid; place-items: center; width: 40px; h
   .docket { box-shadow: 5px 5px 0 var(--k); }
 }
 
+/* ===== Two-ad test ===== */
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 56px; margin-top: 48px; }
+.pick { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.pick .proof-fig { max-width: 460px; }
+.plate { position: absolute; top: 10px; left: 10px; z-index: 1; width: 44px; height: 44px; display: grid; place-items: center;
+  background: var(--k); color: var(--yellow); font-family: var(--display); font-weight: 800; font-size: 24px; }
+.pick .vote { max-width: 460px; width: 100%; justify-self: center; align-self: center; flex-direction: row; justify-content: space-between; align-items: center; }
+.pick .vote span { font-size: 19px; }
+.pick.won .vote { background: var(--yellow); }
+.stamp.human { border-color: var(--aqua-ink); color: var(--aqua-ink); background: rgba(147, 209, 226, .18); transform: translate(-50%, -50%) rotate(7deg); }
+.test-actions { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: center; margin-top: 36px; }
+.answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 56px; margin-top: 40px; }
+.answers .answer.human { border-top-color: var(--aqua-ink); }
+.answers .answer.human .spec { color: var(--aqua-ink); }
+@media (max-width: 640px) {
+  .duo, .answers { gap: 16px; }
+  .duo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .answers { grid-template-columns: minmax(0, 1fr); }
+  .proof { padding: 14px; }
+  .plate { width: 32px; height: 32px; font-size: 18px; }
+  .pick .vote { padding: 12px; }
+  .pick .vote span { font-size: 14px; }
+  .pick .vote b { font-size: 36px; }
+  .stamp { font-size: 11px; padding: 6px 8px; border-width: 3px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .stamp.human { animation: stampH .45s cubic-bezier(.2, 1.4, .4, 1) both; animation-delay: .25s; }
+  @keyframes stampH { from { transform: translate(-50%, -50%) rotate(7deg) scale(2.2); opacity: 0; } to { transform: translate(-50%, -50%) rotate(7deg) scale(1); opacity: 1; } }
+  .pick.won { animation: won .6s cubic-bezier(.3, 1.5, .5, 1); }
+  @keyframes won { 40% { transform: translateY(-8px); } }
+}
+
+/* Floating jump to the vote */
+.jump { position: fixed; z-index: 35; right: calc(20px + env(safe-area-inset-right, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  display: inline-flex; align-items: center; gap: 10px; padding: 12px 16px 12px 18px; background: var(--k); color: var(--yellow);
+  font-family: var(--display); font-weight: 800; font-size: 16px; letter-spacing: -.01em; text-decoration: none;
+  border: 2px solid var(--k); box-shadow: 5px 5px 0 var(--magenta); transition: opacity .3s, transform .3s, box-shadow .2s; }
+.jump:hover { box-shadow: 7px 7px 0 var(--magenta); transform: translate(-2px, -2px); }
+.jump .arr { display: inline-grid; place-items: center; width: 26px; height: 26px; background: var(--yellow); color: var(--k); font-size: 16px; }
+.jump.gone { opacity: 0; transform: translateY(16px); pointer-events: none; }
+@media (max-width: 640px) { .jump { font-size: 14px; padding: 10px 12px 10px 14px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .jump .arr { animation: nudge 1.6s ease-in-out infinite; }
+  @keyframes nudge { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
+}
+
 /* ===== Motion layer ===== */
 .hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .hero h1 { font-weight: 800; }
@@ -459,7 +505,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
       <a href="#channels" data-for="channels">Channels</a>
       <a href="#outlook" data-for="outlook">Outlook</a>
       <a href="#consequences" data-for="consequences">Consequences</a>
-      <a href="#test" data-for="test" class="go">The test</a>
+      <a href="#test" data-for="test" class="go">Voting</a>
     </div>
   </div>
   <div class="progress" aria-hidden="true"><i id="progress"></i></div>
@@ -473,10 +519,10 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
     <div>
       <p class="spec">DMD 2030 · Final project · UConn Stamford</p>
       <h1>When AI can make the ad, what is the marketer for?</h1>
-      <p class="lead">We split marketing into six channels and asked the same questions of each: who does the work today, which tasks AI is taking over, and what changes by 2031. At the end there is one ad. You decide who made it.</p>
+      <p class="lead">We split marketing into six channels and asked the same questions of each: who does the work today, which tasks AI is taking over, and what changes by 2031. At the end there are two ads. One was made by AI. You decide which.</p>
       <div class="cta-row">
         <a class="btn solid" href="#job">Start with the job</a>
-        <a class="textlink" href="#test">Skip to the test</a>
+        <a class="textlink" href="#test">Go to voting</a>
       </div>
     </div>
     <aside class="docket" aria-label="Project details">
@@ -486,7 +532,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
         <div class="r"><dt>Domain</dt><dd>Marketing, in six channels</dd></div>
         <div class="r"><dt>Tool tested</dt><dd>Adobe Firefly</dd></div>
         <div class="r"><dt>Team</dt><dd id="docketTeam"></dd></div>
-        <div class="r"><dt>Deliverable</dt><dd>This site, and one ad</dd></div>
+        <div class="r"><dt>Deliverable</dt><dd>This site, and two ads</dd></div>
       </dl>
     </aside>
   </div>
@@ -516,7 +562,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
   <div class="wrap">
     <div class="sec-head rv">
       <h2 id="ff-h">The tool we tested: Adobe Firefly.</h2>
-      <p class="lead">Adobe's image generator, sold to brands as safe for commercial use. We used it to make the ad at the end of this page.</p>
+      <p class="lead">Adobe's image generator, sold to brands as safe for commercial use. We used it to make one of the two ads at the end of this page.</p>
     </div>
     <div class="rows" id="ffRows"></div>
   </div>
@@ -526,7 +572,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
   <div class="wrap">
     <div class="sec-head rv">
       <h2 id="ch-h">Six channels, from first impression to the inbox.</h2>
-      <p class="lead">Each one is researched by one of us, in the same order: what the channel is for, who works in it, the workflow, a task we tested, and what changes next.</p>
+      <p class="lead">Each one is researched by one of us, in the same order: what the channel is for, who works in it, the workflow, a task we tested, and one unintended consequence. The forecast for all of marketing comes after.</p>
     </div>
     <nav class="index rv" style="--d:1" id="chanIndex" aria-label="Channels"></nav>
   </div>
@@ -561,42 +607,29 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
   <div class="halftone" aria-hidden="true"></div>
   <div class="wrap">
     <div class="sec-head rv">
-      <h2 id="test-h">One ad. Who made it?</h2>
-      <p class="lead">Look at it for ten seconds. Then raise a hand for Human or AI, and we count.</p>
+      <h2 id="test-h">Two ads. One is AI.</h2>
+      <p class="lead">One was made by a person, one by Adobe Firefly. Look at both for ten seconds, then raise a hand for the one you think is AI.</p>
     </div>
-    <div class="test-grid">
-      <figure class="proof-fig rv" style="--d:1">
-        <div class="proof" id="proof">
-          <span class="cm tl"></span><span class="cm tr"></span><span class="cm bl"></span><span class="cm br"></span>
-          <div class="ad" id="ad"></div>
-        </div>
-        <figcaption class="spec" id="adSpec"></figcaption>
-      </figure>
-      <div class="panel rv" style="--d:2">
-        <h3>Your vote</h3>
-        <div class="votes">
-          <button class="vote" id="vH" type="button" aria-label="Vote human"><span>Human</span><b id="cH">0</b></button>
-          <button class="vote" id="vA" type="button" aria-label="Vote AI"><span>AI</span><b id="cA">0</b></button>
-        </div>
-        <div class="panel-actions">
-          <button class="btn solid" id="revealBtn" type="button" aria-pressed="false">Reveal the answer</button>
-          <button class="linkbtn" id="undoBtn" type="button">Undo last vote</button>
-          <span id="clearSlot"></span>
-        </div>
-        <div id="answer" hidden></div>
-      </div>
+    <div class="duo" id="duo"></div>
+    <div class="test-actions rv" style="--d:3">
+      <button class="btn solid" id="revealBtn" type="button" aria-pressed="false">Reveal the answer</button>
+      <button class="linkbtn" id="undoBtn" type="button">Undo last vote</button>
+      <span id="clearSlot"></span>
     </div>
+    <div class="answers" id="answer" hidden></div>
     <div class="stats rv" style="--d:3">
       <div class="stat"><b id="sN">0</b><p>Votes cast in this room</p></div>
-      <div class="stat"><b class="red" id="sAI">?</b><p>Of this room said AI. Shown after the reveal.</p></div>
+      <div class="stat"><b class="red" id="sAI">?</b><p>Of this room picked the AI ad. Shown after the reveal.</p></div>
       <div class="stat"><b>70%</b><p>Of consumers say they can spot AI-generated ads (Canva, 2026)</p></div>
     </div>
     <div class="sheet" id="sheet" hidden>
-      <div class="sheet-head"><h3>Everything we threw away</h3><span class="spec" id="sheetSpec"></span></div>
+      <div class="sheet-head"><h3>Every Firefly image we threw away</h3><span class="spec" id="sheetSpec"></span></div>
       <div class="contacts" id="contacts"></div>
     </div>
   </div>
 </section>
+
+<a class="jump" id="jump" href="#test" aria-label="Go to voting">Go to voting <span class="arr" aria-hidden="true">&#8595;</span></a>
 
 <footer class="foot">
   <div class="colorbar" aria-hidden="true"><i style="--c:#93D1E2"></i><i style="--c:#EE95B6"></i><i style="--c:#F3D263"></i><i style="--c:#1E1C2A"></i><i style="--c:#7F9BD8"></i><i style="--c:#F09A80"></i><i style="--c:#9BCFAE"></i><i style="--c:#5D5B67"></i><i style="--c:#8E8C97"></i><i style="--c:#C3C2C8"></i><i style="--c:#F7F7F2"></i></div>
@@ -607,7 +640,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
       <div><h4>Team</h4><ul id="team"></ul></div>
       <div><h4>Sections</h4><ul>
         <li><a href="#job">The job</a></li><li><a href="#firefly">Firefly</a></li><li><a href="#channels">Channels</a></li>
-        <li><a href="#outlook">Outlook</a></li><li><a href="#consequences">Consequences</a></li><li><a href="#test">The test</a></li></ul></div>
+        <li><a href="#outlook">Outlook</a></li><li><a href="#consequences">Consequences</a></li><li><a href="#test">Voting</a></li></ul></div>
       <div><h4>Sources</h4><ul>
         <li><a href="https://investor.forrester.com/news-releases/news-release-details/forrester-nine-10-us-marketing-agencies-use-ai-cut-costs-expense" target="_blank" rel="noopener">Forrester × 4As, 2026</a></li>
         <li><a href="https://supermetrics.com/blog/ai-marketing-statistics" target="_blank" rel="noopener">Canva, via Supermetrics</a></li>
@@ -620,17 +653,16 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
 <script>
 /* ============ CONTENT: edit here. Anything in [brackets] shows as a placeholder. ============ */
 
-/* The one ad. Put the image file next to index.html and set src, e.g. "ad.jpg". */
-const AD = {
-  src: "",
-  title: "[Ad title]",
-  format: "[Format, e.g. Instagram post]",
-  ratio: "4:5",
-  prompt: "[Paste the exact Firefly prompt]",
-  attempts: "[N]",
-  notes: ["[Direction note from the group, e.g. too generic]", "[Another note]", "[Another note]"],
-  rejects: ["", "", "", "", "", "", "", "", "", "", ""]   /* image paths of the throwaways */
-};
+/* The two ads. Exactly one is made by AI: set `ai` on that one.
+   Put the image files next to index.html and set src, e.g. "ad-a.jpg". */
+const ADS = [
+  { plate: "A", ai: true, src: "", format: "[Format, e.g. Instagram post]", ratio: "4:5",
+    prompt: "[Paste the exact Firefly prompt]", attempts: "[N]",
+    notes: ["[Direction note from the group, e.g. too generic]", "[Another note]", "[Another note]"],
+    rejects: ["", "", "", "", "", "", "", "", "", "", ""] },          /* image paths of the throwaways */
+  { plate: "B", ai: false, src: "", format: "[Format, e.g. Instagram post]", ratio: "4:5",
+    maker: "[Who made it]", how: "[How it was made: photo, layout, tools, time it took]" }
+];
 
 const JOB = [
   { step: "Brief", what: "The client sets the goal, the audience and the budget", who: "Account manager, client" },
@@ -651,17 +683,17 @@ const FIREFLY = [
 ];
 
 const CHANNELS = [
-  { id: "brand", name: "Brand advertising", stage: "Awareness", owner: "Elizabeth C.",
+  { id: "brand", name: "Brand advertising", stage: "Awareness", owner: "Elizabeth",
     automates: ["Concept visuals", "Variations", "Resizing"], human: ["The big idea", "Taste", "Brand consistency"] },
-  { id: "social", name: "Social media", stage: "Awareness", owner: "Martin G.",
+  { id: "social", name: "Social media", stage: "Awareness", owner: "Martin",
     automates: ["Post volume", "Captions", "Trend formats"], human: ["Brand voice", "Community", "Cultural timing"] },
-  { id: "content", name: "Content & copywriting", stage: "Consideration", owner: "Emiliano S.",
+  { id: "content", name: "Content & copywriting", stage: "Consideration", owner: "Emiliano",
     automates: ["First drafts", "Headline variants", "SEO copy"], human: ["Storytelling", "Editing", "Point of view"] },
-  { id: "search", name: "AI search", stage: "Consideration", owner: "[Sixth member]",
+  { id: "search", name: "AI search", stage: "Consideration", owner: "Emiliano",
     automates: ["Answers that replace clicks", "Comparisons", "Keyword research"], human: ["Reputation", "Trust", "Original expertise"] },
-  { id: "paid", name: "Paid performance", stage: "Conversion", owner: "Shiven J.",
+  { id: "paid", name: "Paid performance", stage: "Conversion", owner: "Shiven",
     automates: ["Bidding", "Targeting", "Variant testing"], human: ["Budget strategy", "Deciding what good means", "Brand safety"] },
-  { id: "email", name: "Email & personalization", stage: "Retention", owner: "Lee C.",
+  { id: "email", name: "Email & personalization", stage: "Retention", owner: "Lee",
     automates: ["Segmentation", "Send timing", "One-to-one content"], human: ["Privacy calls", "Tone", "When not to send"] }
 ];
 /* Deep dive per channel. Workflow tags: "Human-led", "AI-assisted" or "Automated". */
@@ -671,8 +703,6 @@ CHANNELS.forEach(c => {
     roles: [{ t: "[Job title]", d: "[What this person does day to day]" }, { t: "[Job title]", d: "[What this person does day to day]" }],
     workflow: "[List the steps of the job in order, then tag each one: human-led, AI-assisted or automated]",
     tested: "[One real task we tried with Claude or Firefly: what we asked, what came back, what a person had to fix]",
-    short: "[What changes in 1–3 years, with a source]",
-    medium: "[What changes in 3–5 years, with a source]",
     consequence: "[One unintended outcome for the people in these roles]"
   };
 });
@@ -728,12 +758,13 @@ const PROCESS = [
 ];
 const swatch = i => PROCESS.at(i % PROCESS.length);
 function renderStatic() {
-  const words = [...CHANNELS.map(c => c.name), "One ad at the end", "Human or AI?"];
+  const words = [...CHANNELS.map(c => c.name), "Two ads at the end", "Which one is AI?"];
   const dots = ["var(--cyan)", "var(--magenta)", "var(--yellow)"];
   const run = () => words.map((w, i) => el("span", { style: "--dot:" + dots.at(i % 3), text: w }));
   document.getElementById("ticker").replaceChildren(...run(), ...run());
-  document.getElementById("docketTeam").textContent = CHANNELS.map(c => c.owner).join(", ");
-  document.getElementById("team").replaceChildren(...CHANNELS.map(c => el("li", { text: c.owner + ", " + c.name })));
+  const people = [...new Set(CHANNELS.map(c => c.owner))];
+  document.getElementById("docketTeam").textContent = people.join(", ");
+  document.getElementById("team").replaceChildren(...people.map(who => el("li", { text: who + ", " + CHANNELS.filter(c => c.owner === who).map(c => c.name).join(" and ") })));
 
   document.getElementById("jobRows").replaceChildren(...JOB.map((r, i) => el("tr", { style: "--r:" + i },
     el("td", { class: "n" }, el("span", { style: "--bg:" + swatch(i).bg + ";--fg:" + swatch(i).fg, text: String(i + 1) })), cell(r.step, "step"), cell(r.what), cell(r.who), cell(r.by2031, "tag"))));
@@ -784,35 +815,39 @@ function channel(c, i) {
             el("span", { class: "fs", text: x.step }), el("span", { class: "ft" + tagCls(x.tag), text: x.tag || "Untagged" })))))
         : txt(d.workflow)),
       row("We tested it", txt(d.tested)),
-      row("Forecast", el("div", { class: "fc" },
-        el("div", {}, el("span", { class: "spec", text: "1–3 years" }), txt(d.short)),
-        el("div", {}, el("span", { class: "spec", text: "3–5 years" }), txt(d.medium)))),
       row("Unintended consequence", txt(d.consequence))));
 }
 
 /* ============ The test ============ */
-const KEY = "spot-the-machine-v2";
-let state = { h: 0, a: 0, log: [], revealed: false };
-try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && typeof s.h === "number") state = s; } catch (e) {}
+const KEY = "spot-the-machine-v3";
+let state = { A: 0, B: 0, log: [], revealed: false };
+try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && typeof s.A === "number") state = s; } catch (e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
 const pct = (a, n) => n ? Math.round(a / n * 100) + "%" : "–";
+const aiAd = () => ADS.find(a => a.ai) || ADS[0];
 
-function renderAd() {
-  const ad = document.getElementById("ad");
-  ad.style.aspectRatio = AD.ratio.replace(":", " / ");
-  const kids = [AD.src ? el("img", { src: AD.src, alt: "The test ad" })
-    : el("div", { class: "ph" }, el("div", {}, el("b", { text: AD.ratio }), el("span", { class: "spec", text: "The ad goes here" })))];
-  if (state.revealed) kids.push(el("div", { class: "stamp", text: "AI · ADOBE FIREFLY" }));
-  ad.replaceChildren(...kids);
-  document.getElementById("adSpec").textContent = [AD.format, AD.ratio, state.revealed ? "Made with Adobe Firefly" : "Medium withheld"].join(" · ");
+function renderDuo() {
+  document.getElementById("duo").replaceChildren(...ADS.map((ad, i) => {
+    const kids = [el("span", { class: "plate", text: ad.plate }),
+      ad.src ? el("img", { src: ad.src, alt: "Ad " + ad.plate })
+             : el("div", { class: "ph" }, el("div", {}, el("b", { text: ad.plate }), el("span", { class: "spec", text: "Ad " + ad.plate + " goes here" })))];
+    if (state.revealed) kids.push(el("div", { class: "stamp" + (ad.ai ? "" : " human"), text: ad.ai ? "AI · ADOBE FIREFLY" : "HUMAN" }));
+    return el("div", { class: "pick rv" + (state.revealed && ad.ai ? " won" : ""), style: "--d:" + (i + 1) },
+      el("figure", { class: "proof-fig" },
+        el("div", { class: "proof", id: "proof-" + ad.plate },
+          el("span", { class: "cm tl" }), el("span", { class: "cm tr" }), el("span", { class: "cm bl" }), el("span", { class: "cm br" }),
+          el("div", { class: "ad", style: "aspect-ratio:" + ad.ratio.replace(":", " / ") }, kids)),
+        el("figcaption", { class: "spec", text: [ad.format, ad.ratio, state.revealed ? (ad.ai ? "Made with Adobe Firefly" : "Made by a person") : "Maker withheld"].join(" · ") })),
+      el("button", { class: "vote", id: "v" + ad.plate, type: "button", "aria-label": "Vote that ad " + ad.plate + " is AI",
+        onclick: () => vote(ad.plate) }, el("span", { text: ad.plate + " is AI" }), el("b", { id: "c" + ad.plate, text: String(state[ad.plate]) })));
+  }));
 }
 function renderVotes(bumped) {
-  const n = state.h + state.a;
-  document.getElementById("cH").textContent = state.h;
-  document.getElementById("cA").textContent = state.a;
+  const n = state.A + state.B, right = state[aiAd().plate];
+  ADS.forEach(ad => { const b = document.getElementById("c" + ad.plate); if (b) b.textContent = state[ad.plate]; });
   document.getElementById("sN").textContent = n;
-  document.getElementById("sAI").textContent = state.revealed ? pct(state.a, n) : "?";
-  if (bumped) { const b = document.getElementById(bumped); b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); }
+  document.getElementById("sAI").textContent = state.revealed ? pct(right, n) : "?";
+  if (bumped) { const b = document.getElementById(bumped); if (b) { b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); } }
 }
 function renderAnswer() {
   const R = state.revealed, box = document.getElementById("answer"), sheet = document.getElementById("sheet");
@@ -821,22 +856,26 @@ function renderAnswer() {
   rb.setAttribute("aria-pressed", String(R));
   box.hidden = !R; sheet.hidden = !R;
   if (!R) return;
-  box.replaceChildren(
-    el("span", { class: "spec", text: "The answer: AI" }),
-    el("p", {}, "Made with Adobe Firefly. We kept 1 of ", el("b", { class: isTodo(AD.attempts) ? "todo" : "", text: AD.attempts }), " attempts."),
-    el("div", {}, el("span", { class: "spec", text: "The prompt" }), el("p", { class: "prompt" + (isTodo(AD.prompt) ? " todo" : ""), text: AD.prompt })),
-    el("div", {}, el("span", { class: "spec", text: "Our direction notes" }), el("ul", { class: "markup" }, AD.notes.map(x => el("li", { text: x })))));
-  document.getElementById("sheetSpec").textContent = (AD.rejects.length + 1) + " frames · kept 1";
-  const frames = [AD.src, ...AD.rejects];
+  const todoP = (x, cls) => el("p", { class: (cls || "") + (isTodo(x) ? " todo" : ""), text: x });
+  box.replaceChildren(...ADS.map(ad => ad.ai
+    ? el("div", { class: "answer" },
+        el("span", { class: "spec", text: "Ad " + ad.plate + ": AI" }),
+        el("p", {}, "Made with Adobe Firefly. We kept 1 of ", el("b", { class: isTodo(ad.attempts) ? "todo" : "", text: ad.attempts }), " attempts."),
+        el("div", {}, el("span", { class: "spec", text: "The prompt" }), todoP(ad.prompt, "prompt")),
+        el("div", {}, el("span", { class: "spec", text: "Our direction notes" }), el("ul", { class: "markup" }, ad.notes.map(x => el("li", { text: x })))))
+    : el("div", { class: "answer human" },
+        el("span", { class: "spec", text: "Ad " + ad.plate + ": human" }),
+        el("p", {}, "Made by ", el("b", { class: isTodo(ad.maker) ? "todo" : "", text: ad.maker }), "."),
+        todoP(ad.how))));
+  const a = aiAd(), frames = [a.src, ...(a.rejects || [])];
+  document.getElementById("sheetSpec").textContent = frames.length + " frames · kept 1";
   document.getElementById("contacts").replaceChildren(...frames.map((src, i) => el("div", { class: "contact" + (i === 0 ? " keep" : "") },
-    src ? el("img", { src, alt: i === 0 ? "The ad we kept" : "Rejected frame " + (i + 1) }) : null,
+    src ? el("img", { src, alt: i === 0 ? "The AI ad we kept" : "Rejected frame " + (i + 1) }) : null,
     el("span", { class: "spec", text: String(i + 1).padStart(2, "0") + (i === 0 ? " · kept" : "") }))));
 }
-function renderTest(bumped) { renderAd(); renderVotes(bumped); renderAnswer(); }
+function renderTest(bumped) { renderDuo(); renderVotes(bumped); renderAnswer(); }
 
-function vote(k) { state[k]++; state.log.push(k); save(); renderVotes(k === "h" ? "cH" : "cA"); }
-document.getElementById("vH").addEventListener("click", () => vote("h"));
-document.getElementById("vA").addEventListener("click", () => vote("a"));
+function vote(k) { state[k]++; state.log.push(k); save(); renderVotes("c" + k); }
 document.getElementById("undoBtn").addEventListener("click", () => {
   const k = state.log.pop(); if (k) { state[k] = Math.max(0, state[k] - 1); save(); renderVotes(); }
 });
@@ -844,7 +883,7 @@ document.getElementById("revealBtn").addEventListener("click", () => { state.rev
 function showClear() { document.getElementById("clearSlot").replaceChildren(el("button", { class: "linkbtn", type: "button", text: "Clear votes", onclick: askClear })); }
 function askClear() {
   document.getElementById("clearSlot").replaceChildren(el("span", { class: "note" }, "Clear every vote? ",
-    el("button", { class: "linkbtn", type: "button", text: "Clear", onclick: () => { state = { h: 0, a: 0, log: [], revealed: false }; save(); showClear(); renderTest(); } }),
+    el("button", { class: "linkbtn", type: "button", text: "Clear", onclick: () => { state = { A: 0, B: 0, log: [], revealed: false }; save(); showClear(); renderTest(); } }),
     " · ", el("button", { class: "linkbtn", type: "button", text: "Cancel", onclick: showClear })));
 }
 
@@ -973,10 +1012,14 @@ function onScroll() {
 addEventListener("scroll", () => { if (!sTick) { sTick = true; requestAnimationFrame(onScroll); } }, { passive: true });
 onScroll();
 
+/* The jump button hides while the vote is on screen. */
+if ("IntersectionObserver" in window) new IntersectionObserver(es => es.forEach(e =>
+  document.getElementById("jump").classList.toggle("gone", e.isIntersecting)), { rootMargin: "0px 0px -30% 0px" }).observe(document.getElementById("test"));
+
 /* Reveal: the stamp slams down, the proof shakes, ink flies, the room's number counts up. */
 function inkBurst() {
   if (reduce.matches) return;
-  const proof = document.getElementById("proof"), cols = ["var(--cyan)", "var(--magenta)", "var(--yellow)", "var(--red)"];
+  const proof = document.getElementById("proof-" + aiAd().plate), cols = ["var(--cyan)", "var(--magenta)", "var(--yellow)", "var(--red)"];
   proof.classList.remove("shake"); void proof.offsetWidth; proof.classList.add("shake");
   for (let i = 0; i < 26; i++) {
     const a = i / 26 * 6.2832 + (i % 3) * .4, d = 90 + (i * 37) % 140;
@@ -994,7 +1037,7 @@ function countUp(node, to) {
 document.getElementById("revealBtn").addEventListener("click", () => {
   if (!state.revealed) return;
   inkBurst();
-  const n = state.h + state.a; if (n) countUp(document.getElementById("sAI"), Math.round(state.a / n * 100));
+  const n = state.A + state.B; if (n) countUp(document.getElementById("sAI"), Math.round(state[aiAd().plate] / n * 100));
 });
 
 </script>
