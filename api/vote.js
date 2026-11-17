@@ -1,9 +1,9 @@
 // Shared vote counter for the "Spot the Machine" test.
 // Storage: Upstash Redis over REST (connect it in Vercel: Storage -> Upstash for Redis).
-// Host actions (reveal, reset) need the HOST_KEY environment variable to match ?host=... on the page.
+// Reveal and reset need the password (HOST_KEY in Vercel, or 777 if it is not set).
 const URL_ = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
 const TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-const HOST = process.env.HOST_KEY || "";
+const HOST = process.env.HOST_KEY || "777";
 
 async function redis(...parts) {
   const r = await fetch(URL_ + "/" + parts.map(p => encodeURIComponent(String(p))).join("/"), {

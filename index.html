@@ -381,6 +381,13 @@ table.grid td.n span { display: inline-grid; place-items: center; width: 40px; h
 .pick .vote span { font-size: 19px; }
 .pick.won .vote { background: var(--yellow); }
 .stamp.human { border-color: var(--aqua-ink); color: var(--aqua-ink); background: rgba(147, 209, 226, .18); transform: translate(-50%, -50%) rotate(7deg); }
+.pw { display: inline-flex; align-items: center; gap: 12px; }
+.pw label { font-weight: 700; }
+.pw input { width: 110px; height: 46px; border: 2px solid var(--k); background: #FFFFFF; color: var(--k); box-shadow: 4px 4px 0 var(--k);
+  font-family: var(--mono); font-size: 22px; letter-spacing: .4em; text-align: center; padding: 0 0 0 .4em; border-radius: 2px; }
+.pw input:focus { outline: 2px solid var(--magenta); outline-offset: 3px; }
+.pw.wrong input { border-color: var(--red); }
+@media (prefers-reduced-motion: no-preference) { .pw.wrong input { animation: shake .4s; } }
 .vote-status { width: 100%; text-align: center; font-weight: 600; margin: 0; }
 .vote:disabled { cursor: default; }
 .vote:disabled:not(.mine) { opacity: .45; box-shadow: 3px 3px 0 var(--k); }
@@ -639,7 +646,12 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
     <div class="duo" id="duo"></div>
     <div class="test-actions rv" style="--d:3">
       <p class="vote-status" id="voteStatus" aria-live="polite"></p>
-      <button class="btn solid" id="revealBtn" type="button" aria-pressed="false" hidden>Reveal the answer</button>
+      <button class="btn solid" id="revealBtn" type="button" aria-pressed="false">Reveal the answer</button>
+      <span class="pw" id="pwWrap" hidden>
+        <label for="pwInput">Password</label>
+        <input id="pwInput" type="password" inputmode="numeric" autocomplete="off" maxlength="3" placeholder="•••">
+        <button class="linkbtn" id="pwCancel" type="button">Cancel</button>
+      </span>
       <button class="linkbtn" id="resetBtn" type="button" hidden>Reset for a new room</button>
     </div>
     <div class="answers" id="answer" hidden></div>
@@ -1002,7 +1014,7 @@ function renderControls() {
   const mine = myVote(), status = document.getElementById("voteStatus");
   status.textContent = state.revealed ? "" : mine ? "You voted " + mine + "." : "Tap the ad you think is AI. One vote per device.";
   const rb = document.getElementById("revealBtn"), reset = document.getElementById("resetBtn");
-  rb.hidden = remote && !isHost();
+  rb.hidden = pwOpen;
   rb.textContent = state.revealed ? "Hide the answer" : "Reveal the answer";
   rb.setAttribute("aria-pressed", String(state.revealed));
   reset.hidden = !isHost();
@@ -1047,10 +1059,28 @@ async function vote(k) {
   }
   renderDuo(); renderVotes("c" + k); renderControls();
 }
-document.getElementById("revealBtn").addEventListener("click", async () => {
-  const on = !state.revealed;
-  if (isHost()) { try { apply(await api({ action: "reveal", on, key: HOST_KEY })); } catch (e) {} return; }
+/* Reveal is behind a password: the answer shows the moment the last digit is typed. */
+const REVEAL_PASSWORD = "777";
+let pwOpen = false;
+const pwWrap = document.getElementById("pwWrap"), pwInput = document.getElementById("pwInput");
+function openPw(open) {
+  pwOpen = open; pwWrap.hidden = !open; pwInput.value = ""; pwWrap.classList.remove("wrong");
+  renderControls(); if (open) pwInput.focus();
+}
+async function setRevealed(on) {
+  if (remote) { try { apply(await api({ action: "reveal", on, key: REVEAL_PASSWORD })); } catch (e) {} return; }
   state.revealed = on; save(); renderTest(); if (on) celebrate();
+}
+document.getElementById("revealBtn").addEventListener("click", () => openPw(true));
+document.getElementById("pwCancel").addEventListener("click", () => openPw(false));
+pwInput.addEventListener("keydown", e => { if (e.key === "Escape") openPw(false); });
+pwInput.addEventListener("input", () => {
+  const v = pwInput.value;
+  if (v === REVEAL_PASSWORD) { openPw(false); setRevealed(!state.revealed); return; }
+  if (v.length >= REVEAL_PASSWORD.length) {
+    pwWrap.classList.remove("wrong"); void pwWrap.offsetWidth; pwWrap.classList.add("wrong");
+    setTimeout(() => { pwInput.value = ""; }, 350);
+  }
 });
 document.getElementById("resetBtn").addEventListener("click", async () => {
   try { apply(await api({ action: "reset", key: HOST_KEY })); } catch (e) {}
