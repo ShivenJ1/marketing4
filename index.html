@@ -668,7 +668,6 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
 <footer class="foot">
   <div class="colorbar" aria-hidden="true"><i style="--c:#93D1E2"></i><i style="--c:#EE95B6"></i><i style="--c:#F3D263"></i><i style="--c:#1E1C2A"></i><i style="--c:#7F9BD8"></i><i style="--c:#F09A80"></i><i style="--c:#9BCFAE"></i><i style="--c:#5D5B67"></i><i style="--c:#8E8C97"></i><i style="--c:#C3C2C8"></i><i style="--c:#F7F7F2"></i></div>
   <div class="wrap">
-    <h2>The tool made the image. People decided which one was worth showing.</h2>
     <div class="cols">
       <div><h4>Team</h4><ul id="team"></ul></div>
       <div><h4>Sections</h4><ul>
@@ -1027,7 +1026,6 @@ function renderAnswer() {
   const n = state.A + state.B;
   box.replaceChildren(
     el("div", { class: "trick" },
-      el("span", { class: "spec", text: "The trick" }),
       el("h3", { text: "Both ads were made by AI." }),
       el("p", { text: n ? pct(state.A, n) + " of you picked A and " + pct(state.B, n) + " picked B. Every vote assumed the other ad was made by a person, so every vote was wrong."
                         : "Every vote assumes the other ad was made by a person, so every vote is wrong." })));
