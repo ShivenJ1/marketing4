@@ -231,7 +231,7 @@ table.grid.slim td.src { width: 160px; font-family: var(--mono); font-size: 12px
 .markup li { color: var(--red); font-size: 15.5px; display: flex; gap: 10px; }
 .markup li::before { content: ""; width: 16px; height: 2px; background: var(--red); margin-top: 11px; flex: none; }
 
-.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 64px; border-top: 2px solid var(--ink); }
+.stats { display: grid; grid-template-columns: minmax(0, 1fr); margin-top: 64px; border-top: 2px solid var(--ink); }
 .stat { padding: 20px 24px 4px 0; display: flex; flex-direction: column; gap: 8px; }
 .stat + .stat { border-left: 1px solid var(--line); padding-left: 24px; }
 .stat b { font-family: var(--display); font-weight: 800; font-size: clamp(48px, 6vw, 76px); line-height: .9; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
@@ -346,7 +346,7 @@ table.grid td.n span { display: inline-grid; place-items: center; width: 40px; h
 .vote:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--k); }
 #revealBtn { background: var(--k); border-color: var(--k); color: var(--yellow); }
 .stat:nth-child(1) b { color: var(--aqua-ink); }
-.stat:nth-child(3) b { color: var(--rose-ink); }
+.stat b { color: var(--rose-ink); }
 .ad { border: 2px solid var(--k); }
 
 /* footer */
@@ -656,8 +656,6 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
     </div>
     <div class="answers" id="answer" hidden></div>
     <div class="stats rv" style="--d:3">
-      <div class="stat"><b id="sN">0</b><p>Votes cast in this room</p></div>
-      <div class="stat"><b class="red" id="sAI">?</b><p>Of this room got it wrong. Shown after the reveal.</p></div>
       <div class="stat"><b>70%</b><p>Of consumers say they can spot AI-generated ads (Canva, 2026)</p></div>
     </div>
   </div>
@@ -1011,7 +1009,7 @@ function renderDuo() {
     if (state.revealed) kids.push(el("div", { class: "stamp" + (ad.ai ? "" : " human"), text: ad.ai ? "AI · CHATGPT" : "HUMAN" }));
     const btn = el("button", { class: "vote" + (mine === ad.plate ? " mine" : ""), id: "v" + ad.plate, type: "button",
         "aria-label": "Vote that ad " + ad.plate + " is AI", onclick: () => vote(ad.plate) },
-      el("span", { text: ad.plate + " is AI" }), el("b", { id: "c" + ad.plate, text: String(state[ad.plate]) }));
+      el("span", { text: ad.plate + " is AI" }));
     if (state.revealed) btn.disabled = true;
     return el("div", { class: "pick rv" + (state.revealed && ad.ai ? " won" : ""), style: "--d:" + (i + 1) },
       el("figure", { class: "proof-fig" + (shape(ad) < 1 ? " tall" : shape(ad) > 1.2 ? " wide" : "") },
@@ -1022,10 +1020,6 @@ function renderDuo() {
   }));
 }
 function renderVotes(bumped) {
-  const n = state.A + state.B;
-  ADS.forEach(ad => { const b = document.getElementById("c" + ad.plate); if (b) b.textContent = state[ad.plate]; });
-  document.getElementById("sN").textContent = n;
-  document.getElementById("sAI").textContent = state.revealed ? (n ? "100%" : "–") : "?";
   if (bumped) { const b = document.getElementById(bumped); if (b) { b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); } }
 }
 function renderControls() {
@@ -1042,12 +1036,9 @@ function renderAnswer() {
   box.hidden = !R;
   if (!R) return;
   const todoP = (x, cls) => el("p", { class: (cls || "") + (isTodo(x) ? " todo" : ""), text: x });
-  const n = state.A + state.B;
   box.replaceChildren(
     el("div", { class: "trick" },
-      el("h3", { text: "Both ads were made by AI." }),
-      el("p", { text: n ? pct(state.A, n) + " of you picked A and " + pct(state.B, n) + " picked B. Every vote assumed the other ad was made by a person, so every vote was wrong."
-                        : "Every vote assumes the other ad was made by a person, so every vote is wrong." })));
+      el("h3", { text: "Both ads were made by AI." })));
 }
 function renderTest(bumped) { renderDuo(); renderVotes(bumped); renderAnswer(); renderControls(); }
 
@@ -1273,7 +1264,6 @@ function countUp(node, to) {
 }
 function celebrate() {
   inkBurst();
-  const n = state.A + state.B; if (n) countUp(document.getElementById("sAI"), 100);
 }
 
 </script>
