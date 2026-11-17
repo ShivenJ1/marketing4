@@ -249,7 +249,7 @@ table.grid.slim td.src { width: 160px; font-family: var(--mono); font-size: 12px
 /* Footer */
 .foot { background: var(--band); color: var(--band-ink); padding-block: 96px 48px; }
 .foot h2 { max-width: 18ch; }
-.foot .cols { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; margin-top: 72px; padding-top: 32px; border-top: 1px solid var(--band-line); }
+.foot .cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin-top: 72px; padding-top: 32px; border-top: 1px solid var(--band-line); }
 .foot h4 { margin: 0 0 12px; font-family: var(--mono); font-weight: 500; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--band-muted); }
 .foot ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; font-size: 14.5px; }
 .foot a { color: var(--band-ink); text-decoration: none; }
@@ -381,6 +381,11 @@ table.grid td.n span { display: inline-grid; place-items: center; width: 40px; h
 .pick .vote span { font-size: 19px; }
 .pick.won .vote { background: var(--yellow); }
 .stamp.human { border-color: var(--aqua-ink); color: var(--aqua-ink); background: rgba(147, 209, 226, .18); transform: translate(-50%, -50%) rotate(7deg); }
+.vote-status { width: 100%; text-align: center; font-weight: 600; margin: 0; }
+.vote:disabled { cursor: default; }
+.vote:disabled:not(.mine) { opacity: .45; box-shadow: 3px 3px 0 var(--k); }
+.vote.mine { background: var(--yellow); }
+.vote.mine span::after { content: " · your vote"; font-weight: 500; font-size: .8em; }
 .test-actions { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: center; margin-top: 36px; }
 .answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 56px; margin-top: 40px; }
 .trick { grid-column: 1 / -1; background: var(--yellow); color: var(--k); border: 2px solid var(--k); box-shadow: 8px 8px 0 var(--k); padding: 24px 28px; display: flex; flex-direction: column; gap: 8px; }
@@ -577,8 +582,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
 <section class="sec" id="channels" aria-labelledby="ch-h">
   <div class="wrap">
     <div class="sec-head rv">
-      <h2 id="ch-h">Six channels, from first impression to the inbox.</h2>
-      <p class="lead">Each one is researched by one of us, in the same order: what the channel is for, who works in it, the workflow, a task we tested, and one unintended consequence. The forecast for all of marketing comes after.</p>
+      <h2 id="ch-h">Six topics.</h2>
     </div>
     <nav class="index rv" style="--d:1" id="chanIndex" aria-label="Channels"></nav>
   </div>
@@ -604,14 +608,13 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
   <div class="wrap">
     <div class="sec-head rv">
       <h2 id="test-h">Two ads. One is AI.</h2>
-      <p class="lead">One was made by a person, one by ChatGPT. Look at both for ten seconds, then raise a hand for the one you think is AI.</p>
+      <p class="lead">One was made by a person, one by ChatGPT. Tap the one you think is AI.</p>
     </div>
     <div class="duo" id="duo"></div>
-    <p class="note duo-note">Student concept ads made for a class project. Not affiliated with or endorsed by Apple.</p>
     <div class="test-actions rv" style="--d:3">
-      <button class="btn solid" id="revealBtn" type="button" aria-pressed="false">Reveal the answer</button>
-      <button class="linkbtn" id="undoBtn" type="button">Undo last vote</button>
-      <span id="clearSlot"></span>
+      <p class="vote-status" id="voteStatus" aria-live="polite"></p>
+      <button class="btn solid" id="revealBtn" type="button" aria-pressed="false" hidden>Reveal the answer</button>
+      <button class="linkbtn" id="resetBtn" type="button" hidden>Reset for a new room</button>
     </div>
     <div class="answers" id="answer" hidden></div>
     <div class="stats rv" style="--d:3">
@@ -633,7 +636,6 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
   <div class="wrap">
     <h2>The tool made the image. People decided which one was worth showing.</h2>
     <div class="cols">
-      <div><p>DMD 2030 final project, UConn Stamford. Researched by the six of us.</p></div>
       <div><h4>Team</h4><ul id="team"></ul></div>
       <div><h4>Sections</h4><ul>
         <li><a href="#claude">Claude</a></li><li><a href="#channels">Channels</a></li>
@@ -925,44 +927,65 @@ function channel(c, i) {
       row("Unintended consequence", txt(d.consequence))));
 }
 
-/* ============ The test ============ */
-const KEY = "spot-the-machine-v3";
-let state = { A: 0, B: 0, log: [], revealed: false };
-try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s && typeof s.A === "number") state = s; } catch (e) {}
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+/* ============ The test ============
+   One vote per device. On the live site, votes go to a shared counter (api/vote) so every phone
+   adds to the same tally, and the presenter (the page opened with ?host=KEY) controls the reveal.
+   Without the counter (a preview, or before storage is connected) the page counts on this device only. */
+const LOCAL_KEY = "spot-the-machine-v4", ME_KEY = "spot-the-machine-me";
+const HOST_KEY = new URLSearchParams(location.search).get("host") || "";
+let remote = false, round = 0;
+let state = { A: 0, B: 0, revealed: false };
+try { const t = JSON.parse(localStorage.getItem(LOCAL_KEY) || "null"); if (t && typeof t.A === "number") state = t; } catch (e) {}
+const save = () => { if (!remote) try { localStorage.setItem(LOCAL_KEY, JSON.stringify(state)); } catch (e) {} };
+let me = { id: "", choice: "", round: -1 };
+try { const m = JSON.parse(localStorage.getItem(ME_KEY) || "null"); if (m && m.id) me = m; } catch (e) {}
+if (!me.id) me.id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : "d" + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+const saveMe = () => { try { localStorage.setItem(ME_KEY, JSON.stringify(me)); } catch (e) {} };
+saveMe();
+const myVote = () => (me.round === round ? me.choice : "");
 const pct = (a, n) => n ? Math.round(a / n * 100) + "%" : "–";
-const aiAd = () => ADS.find(a => a.ai) || ADS[0];
-
 const shape = ad => ad.ratio.split(":")[0] / ad.ratio.split(":")[1];
+const isHost = () => remote && !!HOST_KEY;
+
 function renderDuo() {
   /* a landscape ad gets a wider column so its small print stays readable */
   document.getElementById("duo").style.gridTemplateColumns = ADS.map(ad => "minmax(0, " + (shape(ad) > 1.2 ? 1.75 : 1) + "fr)").join(" ");
+  const mine = myVote();
   document.getElementById("duo").replaceChildren(...ADS.map((ad, i) => {
     const kids = [el("span", { class: "plate", text: ad.plate }),
       ad.src ? el("img", { src: ad.src, alt: "Ad " + ad.plate })
              : el("div", { class: "ph" }, el("div", {}, el("b", { text: ad.plate }), el("span", { class: "spec", text: "Ad " + ad.plate + " goes here" })))];
     if (state.revealed) kids.push(el("div", { class: "stamp" + (ad.ai ? "" : " human"), text: ad.ai ? "AI · CHATGPT" : "HUMAN" }));
+    const btn = el("button", { class: "vote" + (mine === ad.plate ? " mine" : ""), id: "v" + ad.plate, type: "button",
+        "aria-label": "Vote that ad " + ad.plate + " is AI", onclick: () => vote(ad.plate) },
+      el("span", { text: ad.plate + " is AI" }), el("b", { id: "c" + ad.plate, text: String(state[ad.plate]) }));
+    if (mine) btn.disabled = true;
     return el("div", { class: "pick rv" + (state.revealed && ad.ai ? " won" : ""), style: "--d:" + (i + 1) },
       el("figure", { class: "proof-fig" + (shape(ad) < 1 ? " tall" : shape(ad) > 1.2 ? " wide" : "") },
         el("div", { class: "proof", id: "proof-" + ad.plate },
           el("span", { class: "cm tl" }), el("span", { class: "cm tr" }), el("span", { class: "cm bl" }), el("span", { class: "cm br" }),
           el("div", { class: "ad", style: "aspect-ratio:" + ad.ratio.replace(":", " / ") }, kids))),
-      el("button", { class: "vote", id: "v" + ad.plate, type: "button", "aria-label": "Vote that ad " + ad.plate + " is AI",
-        onclick: () => vote(ad.plate) }, el("span", { text: ad.plate + " is AI" }), el("b", { id: "c" + ad.plate, text: String(state[ad.plate]) })));
+      btn);
   }));
 }
 function renderVotes(bumped) {
-  const n = state.A + state.B, right = 0;
+  const n = state.A + state.B;
   ADS.forEach(ad => { const b = document.getElementById("c" + ad.plate); if (b) b.textContent = state[ad.plate]; });
   document.getElementById("sN").textContent = n;
   document.getElementById("sAI").textContent = state.revealed ? (n ? "100%" : "–") : "?";
   if (bumped) { const b = document.getElementById(bumped); if (b) { b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); } }
 }
+function renderControls() {
+  const mine = myVote(), status = document.getElementById("voteStatus");
+  status.textContent = state.revealed ? "" : mine ? "You voted " + mine + ". Watch the screen for the answer." : "Tap the ad you think is AI. One vote per device.";
+  const rb = document.getElementById("revealBtn"), reset = document.getElementById("resetBtn");
+  rb.hidden = remote && !isHost();
+  rb.textContent = state.revealed ? "Hide the answer" : "Reveal the answer";
+  rb.setAttribute("aria-pressed", String(state.revealed));
+  reset.hidden = !isHost();
+}
 function renderAnswer() {
   const R = state.revealed, box = document.getElementById("answer"), sheet = document.getElementById("sheet");
-  const rb = document.getElementById("revealBtn");
-  rb.textContent = R ? "Hide the answer" : "Reveal the answer";
-  rb.setAttribute("aria-pressed", String(R));
   box.hidden = !R; sheet.hidden = !R;
   if (!R) return;
   const todoP = (x, cls) => el("p", { class: (cls || "") + (isTodo(x) ? " todo" : ""), text: x });
@@ -989,18 +1012,43 @@ function renderAnswer() {
     f.src ? el("img", { src: f.src, alt: f.keep ? "Ad " + f.plate + ", the one we kept" : "Rejected frame for ad " + f.plate }) : null,
     el("span", { class: "spec", text: String(i + 1).padStart(2, "0") + (f.keep ? " · ad " + f.plate : "") }))));
 }
-function renderTest(bumped) { renderDuo(); renderVotes(bumped); renderAnswer(); }
+function renderTest(bumped) { renderDuo(); renderVotes(bumped); renderAnswer(); renderControls(); }
 
-function vote(k) { state[k]++; state.log.push(k); save(); renderVotes("c" + k); }
-document.getElementById("undoBtn").addEventListener("click", () => {
-  const k = state.log.pop(); if (k) { state[k] = Math.max(0, state[k] - 1); save(); renderVotes(); }
+async function api(body) {
+  const r = await fetch("api/vote", body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : { cache: "no-store" });
+  if (!r.ok) throw new Error(String(r.status));
+  return r.json();
+}
+function apply(t) {
+  const wasRevealed = state.revealed, changedRound = t.round !== round;
+  const changed = changedRound || t.A !== state.A || t.B !== state.B || t.revealed !== state.revealed;
+  state = { A: t.A, B: t.B, revealed: t.revealed }; round = t.round;
+  if (!changed) return;
+  if (changedRound || t.revealed !== wasRevealed) renderTest(); else renderVotes();
+  if (t.revealed && !wasRevealed) celebrate();
+}
+async function vote(k) {
+  if (myVote()) return;
+  me = { id: me.id, choice: k, round }; saveMe();
+  if (remote) {
+    try { apply(await api({ action: "vote", choice: k, id: me.id })); } catch (e) {}
+  } else { state[k]++; save(); }
+  renderDuo(); renderVotes("c" + k); renderControls();
+}
+document.getElementById("revealBtn").addEventListener("click", async () => {
+  const on = !state.revealed;
+  if (isHost()) { try { apply(await api({ action: "reveal", on, key: HOST_KEY })); } catch (e) {} return; }
+  state.revealed = on; save(); renderTest(); if (on) celebrate();
 });
-document.getElementById("revealBtn").addEventListener("click", () => { state.revealed = !state.revealed; save(); renderTest(); });
-function showClear() { document.getElementById("clearSlot").replaceChildren(el("button", { class: "linkbtn", type: "button", text: "Clear votes", onclick: askClear })); }
-function askClear() {
-  document.getElementById("clearSlot").replaceChildren(el("span", { class: "note" }, "Clear every vote? ",
-    el("button", { class: "linkbtn", type: "button", text: "Clear", onclick: () => { state = { A: 0, B: 0, log: [], revealed: false }; save(); showClear(); renderTest(); } }),
-    " · ", el("button", { class: "linkbtn", type: "button", text: "Cancel", onclick: showClear })));
+document.getElementById("resetBtn").addEventListener("click", async () => {
+  try { apply(await api({ action: "reset", key: HOST_KEY })); } catch (e) {}
+});
+async function connect() {
+  try { const t = await api(); remote = true; round = -2; apply(t); renderTest(); } catch (e) { remote = false; renderControls(); return; }
+  setInterval(async () => {
+    if (document.visibilityState !== "visible") return;
+    try { apply(await api()); } catch (e) {}
+  }, 2500);
 }
 
 /* ============ Motion + nav ============ */
@@ -1031,7 +1079,7 @@ addEventListener("scroll", () => { if (!tick) { tick = true; requestAnimationFra
 addEventListener("resize", fill);
 
 renderStatic();
-showClear();
+connect();
 renderTest();
 watch();
 fill();
@@ -1153,11 +1201,10 @@ function countUp(node, to) {
     node.textContent = Math.round(to * e) + "%"; if (k < 1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
 }
-document.getElementById("revealBtn").addEventListener("click", () => {
-  if (!state.revealed) return;
+function celebrate() {
   inkBurst();
   const n = state.A + state.B; if (n) countUp(document.getElementById("sAI"), 100);
-});
+}
 
 </script>
 
