@@ -622,10 +622,6 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
       <div class="stat"><b class="red" id="sAI">?</b><p>Of this room got it wrong. Shown after the reveal.</p></div>
       <div class="stat"><b>70%</b><p>Of consumers say they can spot AI-generated ads (Canva, 2026)</p></div>
     </div>
-    <div class="sheet" id="sheet" hidden>
-      <div class="sheet-head"><h3>Every ChatGPT image we threw away</h3><span class="spec" id="sheetSpec"></span></div>
-      <div class="contacts" id="contacts"></div>
-    </div>
   </div>
 </section>
 
@@ -985,8 +981,8 @@ function renderControls() {
   reset.hidden = !isHost();
 }
 function renderAnswer() {
-  const R = state.revealed, box = document.getElementById("answer"), sheet = document.getElementById("sheet");
-  box.hidden = !R; sheet.hidden = !R;
+  const R = state.revealed, box = document.getElementById("answer");
+  box.hidden = !R;
   if (!R) return;
   const todoP = (x, cls) => el("p", { class: (cls || "") + (isTodo(x) ? " todo" : ""), text: x });
   const n = state.A + state.B;
@@ -995,22 +991,7 @@ function renderAnswer() {
       el("span", { class: "spec", text: "The trick" }),
       el("h3", { text: "Both ads were made by AI." }),
       el("p", { text: n ? pct(state.A, n) + " of you picked A and " + pct(state.B, n) + " picked B. Every vote assumed the other ad was made by a person, so every vote was wrong."
-                        : "Every vote assumes the other ad was made by a person, so every vote is wrong." })),
-    ...ADS.map(ad => ad.ai
-    ? el("div", { class: "answer" },
-        el("span", { class: "spec", text: "Ad " + ad.plate + ": AI" }),
-        el("p", {}, "Made with ChatGPT. We kept 1 of ", el("b", { class: isTodo(ad.attempts) ? "todo" : "", text: ad.attempts }), " attempts."),
-        el("div", {}, el("span", { class: "spec", text: "The prompt" }), todoP(ad.prompt, "prompt")),
-        el("div", {}, el("span", { class: "spec", text: "Our direction notes" }), el("ul", { class: "markup" }, ad.notes.map(x => el("li", { text: x })))))
-    : el("div", { class: "answer human" },
-        el("span", { class: "spec", text: "Ad " + ad.plate + ": human" }),
-        el("p", {}, "Made by ", el("b", { class: isTodo(ad.maker) ? "todo" : "", text: ad.maker }), "."),
-        todoP(ad.how))));
-  const frames = ADS.flatMap(ad => [{ src: ad.src, keep: true, plate: ad.plate }, ...(ad.rejects || []).map(src => ({ src, keep: false, plate: ad.plate }))]);
-  document.getElementById("sheetSpec").textContent = frames.length + " frames · kept 2";
-  document.getElementById("contacts").replaceChildren(...frames.map((f, i) => el("div", { class: "contact" + (f.keep ? " keep" : "") },
-    f.src ? el("img", { src: f.src, alt: f.keep ? "Ad " + f.plate + ", the one we kept" : "Rejected frame for ad " + f.plate }) : null,
-    el("span", { class: "spec", text: String(i + 1).padStart(2, "0") + (f.keep ? " · ad " + f.plate : "") }))));
+                        : "Every vote assumes the other ad was made by a person, so every vote is wrong." })));
 }
 function renderTest(bumped) { renderDuo(); renderVotes(bumped); renderAnswer(); renderControls(); }
 
