@@ -1064,9 +1064,9 @@ async function connect() {
 }
 
 /* ============ Scan to vote ============
-   The code is built from this page's own address, minus any ?host= password, and lands on the vote. */
+   The code always points at the live site and lands on the vote. */
 function renderQR() {
-  const url = location.origin + location.pathname.replace(/index\.html$/, "") + "#test";
+  const url = "https://marketing3-flny.vercel.app/#test";
   const box = document.getElementById("qr");
   if (typeof window.qrcode !== "function") return;
   const q = window.qrcode(0, "M"); q.addData(url); q.make();
