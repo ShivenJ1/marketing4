@@ -866,7 +866,7 @@ const OUTLOOK = [
   { when: "Now · 2026", title: "Where it stands", text: "AI is already inside most agency work. The open question is what it takes over next.",
     fact: { big: "9 in 10", text: "US marketing agencies use generative AI.", src: "Forrester × 4As, 2026",
       url: "https://investor.forrester.com/news-releases/news-release-details/forrester-nine-10-us-marketing-agencies-use-ai-cut-costs-expense" } },
-  { when: "Short-term · 1–3 years · 2027–2029", title: "Ads you have to engage with", text: "[One sentence summing up the next three years]",
+  { when: "Short-term · 1–3 years · 2027–2029", title: "Ads you have to engage with", text: "Ads stop being something you scroll past and become something you have to do.",
     rows: THEMES.map(t => ({ t, v: "[What could happen]", s: "[Source]" })) },
   { when: "Medium-term · 3–5 years · 2029–2031", title: "Ads inside your head", text: "Since AI is growing faster every day, anything is possible.",
     rows: THEMES.map(t => ({ t, v: "[What could happen]", s: "[Source]" })) }
@@ -875,6 +875,15 @@ const OUTLOOK = [
 const fillTheme = (stage, theme, v) => Object.assign(OUTLOOK[stage].rows.find(r => r.t === theme), { v });
 fillTheme(1, "Consumers & trust", "Customers must watch and interact with an ad to get a free meal or a discount.");
 fillTheme(1, "Search & discovery", "Ads will start to become controversial on purpose to gain publicity and attention.");
+fillTheme(1, "Jobs & roles", "Fewer junior roles. One marketer runs work that used to take a team.");
+fillTheme(1, "Tools & workflow", "AI makes the first draft of almost every ad.");
+fillTheme(1, "Agencies & budgets", "Smaller agencies, smaller retainers, more money moved to ad spend.");
+fillTheme(1, "Rules & regulation", "AI-made ads must be labeled.");
+fillTheme(2, "Jobs & roles", "Marketers become editors and decision-makers, not makers.");
+fillTheme(2, "Agencies & budgets", "Brands bring most work in-house.");
+fillTheme(2, "Search & discovery", "People ask an AI assistant instead of searching, so brands market to the AI.");
+fillTheme(2, "Consumers & trust", "People trust real faces and real reviews more than polished ads.");
+fillTheme(2, "Rules & regulation", "Laws on brain data and AI targeting.");
 fillTheme(2, "Tools & workflow", "Neuralink connects the human brain with computers, letting people with paralysis communicate their thoughts. As it is studied and encouraged, companies may start inputting ads into it, reaching customers directly inside their own thoughts.");
 
 
