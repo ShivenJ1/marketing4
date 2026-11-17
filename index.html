@@ -379,6 +379,10 @@ table.grid td.n span { display: inline-grid; place-items: center; width: 40px; h
 .stamp.human { border-color: var(--aqua-ink); color: var(--aqua-ink); background: rgba(147, 209, 226, .18); transform: translate(-50%, -50%) rotate(7deg); }
 .test-actions { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: center; margin-top: 36px; }
 .answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 56px; margin-top: 40px; }
+.trick { grid-column: 1 / -1; background: var(--yellow); color: var(--k); border: 2px solid var(--k); box-shadow: 8px 8px 0 var(--k); padding: 24px 28px; display: flex; flex-direction: column; gap: 8px; }
+.trick .spec { color: var(--k); }
+.trick h3 { font-size: clamp(30px, 4vw, 48px); letter-spacing: -.04em; }
+.trick p { max-width: 60ch; }
 .answers .answer.human { border-top-color: var(--aqua-ink); }
 .answers .answer.human .spec { color: var(--aqua-ink); }
 @media (max-width: 640px) {
@@ -393,6 +397,8 @@ table.grid td.n span { display: inline-grid; place-items: center; width: 40px; h
   .stamp { font-size: 11px; padding: 6px 8px; border-width: 3px; }
 }
 @media (prefers-reduced-motion: no-preference) {
+  .trick { animation: trickIn .7s cubic-bezier(.2, 1.3, .4, 1) both; }
+  @keyframes trickIn { from { transform: scale(.9) rotate(-2deg); opacity: 0; } to { transform: none; opacity: 1; } }
   .stamp.human { animation: stampH .45s cubic-bezier(.2, 1.4, .4, 1) both; animation-delay: .25s; }
   @keyframes stampH { from { transform: translate(-50%, -50%) rotate(7deg) scale(2.2); opacity: 0; } to { transform: translate(-50%, -50%) rotate(7deg) scale(1); opacity: 1; } }
   .pick.won { animation: won .6s cubic-bezier(.3, 1.5, .5, 1); }
@@ -557,7 +563,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
   <div class="wrap">
     <div class="sec-head rv">
       <h2 id="ff-h">The tool we tested: Claude.</h2>
-      <p class="lead">Anthropic's AI assistant. We tested it on the kind of work marketers do every day. The AI ad at the end was made with ChatGPT, because Claude doesn't make images.</p>
+      <p class="lead">Anthropic's AI assistant. We tested it on the kind of work marketers do every day. The AI images at the end came from ChatGPT, because Claude doesn't make images.</p>
     </div>
     <div class="rows" id="ffRows"></div>
   </div>
@@ -604,7 +610,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
     <div class="answers" id="answer" hidden></div>
     <div class="stats rv" style="--d:3">
       <div class="stat"><b id="sN">0</b><p>Votes cast in this room</p></div>
-      <div class="stat"><b class="red" id="sAI">?</b><p>Of this room picked the AI ad. Shown after the reveal.</p></div>
+      <div class="stat"><b class="red" id="sAI">?</b><p>Of this room got it wrong. Shown after the reveal.</p></div>
       <div class="stat"><b>70%</b><p>Of consumers say they can spot AI-generated ads (Canva, 2026)</p></div>
     </div>
     <div class="sheet" id="sheet" hidden>
@@ -639,15 +645,17 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
 <script>
 /* ============ CONTENT: edit here. Anything in [brackets] shows as a placeholder. ============ */
 
-/* The two ads. Exactly one is made by AI: set `ai` on that one.
+/* The two ads. The page tells the room one is AI. The trick: both are.
    Put the image files next to index.html and set src, e.g. "ad-a.jpg". */
 const ADS = [
   { plate: "A", ai: true, src: "", format: "[Format, e.g. Instagram post]", ratio: "4:5",
     prompt: "[Paste the exact ChatGPT prompt]", attempts: "[N]",
     notes: ["[Direction note from the group, e.g. too generic]", "[Another note]", "[Another note]"],
     rejects: ["", "", "", "", "", "", "", "", "", "", ""] },          /* image paths of the throwaways */
-  { plate: "B", ai: false, src: "", format: "[Format, e.g. Instagram post]", ratio: "4:5",
-    maker: "[Who made it]", how: "[How it was made: photo, layout, tools, time it took]" }
+  { plate: "B", ai: true, src: "", format: "[Format, e.g. Instagram post]", ratio: "4:5",
+    prompt: "[Paste the exact ChatGPT prompt]", attempts: "[N]",
+    notes: ["[Direction note from the group]", "[Another note]"],
+    rejects: [] }
 ];
 
 const PLATFORM = [
@@ -658,7 +666,7 @@ const PLATFORM = [
   { k: "How it changes the job", v: ["First drafts, research summaries and page builds move to the AI.",
     "The marketer's work shifts to writing the brief, judging what comes back, and fixing what's wrong."] },
   { k: "What we tested", v: ["We gave it real marketing tasks from this project: finding and summarizing the industry reports we cite, planning work across a team of six, and drafting research templates for each channel."] },
-  { k: "Where it fell short", v: ["It can't make images, so the AI ad was made with ChatGPT.",
+  { k: "Where it fell short", v: ["It can't make images, so we made the AI images with ChatGPT.",
     "Its first drafts looked and sounded like everything else AI makes. Getting something distinctive took many rounds of our direction.",
     "It couldn't confirm every number: one report is behind a paywall, and one statistic came from a secondhand source.",
     "Its drafts sounded right but were generic. The real roles and examples came from our own research."] }
@@ -936,10 +944,10 @@ function renderDuo() {
   }));
 }
 function renderVotes(bumped) {
-  const n = state.A + state.B, right = state[aiAd().plate];
+  const n = state.A + state.B, right = 0;
   ADS.forEach(ad => { const b = document.getElementById("c" + ad.plate); if (b) b.textContent = state[ad.plate]; });
   document.getElementById("sN").textContent = n;
-  document.getElementById("sAI").textContent = state.revealed ? pct(right, n) : "?";
+  document.getElementById("sAI").textContent = state.revealed ? (n ? "100%" : "–") : "?";
   if (bumped) { const b = document.getElementById(bumped); if (b) { b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump"); } }
 }
 function renderAnswer() {
@@ -950,7 +958,14 @@ function renderAnswer() {
   box.hidden = !R; sheet.hidden = !R;
   if (!R) return;
   const todoP = (x, cls) => el("p", { class: (cls || "") + (isTodo(x) ? " todo" : ""), text: x });
-  box.replaceChildren(...ADS.map(ad => ad.ai
+  const n = state.A + state.B;
+  box.replaceChildren(
+    el("div", { class: "trick" },
+      el("span", { class: "spec", text: "The trick" }),
+      el("h3", { text: "Both ads were made by AI." }),
+      el("p", { text: n ? pct(state.A, n) + " of you picked A and " + pct(state.B, n) + " picked B. Every vote assumed the other ad was made by a person, so every vote was wrong."
+                        : "Every vote assumes the other ad was made by a person, so every vote is wrong." })),
+    ...ADS.map(ad => ad.ai
     ? el("div", { class: "answer" },
         el("span", { class: "spec", text: "Ad " + ad.plate + ": AI" }),
         el("p", {}, "Made with ChatGPT. We kept 1 of ", el("b", { class: isTodo(ad.attempts) ? "todo" : "", text: ad.attempts }), " attempts."),
@@ -960,11 +975,11 @@ function renderAnswer() {
         el("span", { class: "spec", text: "Ad " + ad.plate + ": human" }),
         el("p", {}, "Made by ", el("b", { class: isTodo(ad.maker) ? "todo" : "", text: ad.maker }), "."),
         todoP(ad.how))));
-  const a = aiAd(), frames = [a.src, ...(a.rejects || [])];
-  document.getElementById("sheetSpec").textContent = frames.length + " frames · kept 1";
-  document.getElementById("contacts").replaceChildren(...frames.map((src, i) => el("div", { class: "contact" + (i === 0 ? " keep" : "") },
-    src ? el("img", { src, alt: i === 0 ? "The AI ad we kept" : "Rejected frame " + (i + 1) }) : null,
-    el("span", { class: "spec", text: String(i + 1).padStart(2, "0") + (i === 0 ? " · kept" : "") }))));
+  const frames = ADS.flatMap(ad => [{ src: ad.src, keep: true, plate: ad.plate }, ...(ad.rejects || []).map(src => ({ src, keep: false, plate: ad.plate }))]);
+  document.getElementById("sheetSpec").textContent = frames.length + " frames · kept 2";
+  document.getElementById("contacts").replaceChildren(...frames.map((f, i) => el("div", { class: "contact" + (f.keep ? " keep" : "") },
+    f.src ? el("img", { src: f.src, alt: f.keep ? "Ad " + f.plate + ", the one we kept" : "Rejected frame for ad " + f.plate }) : null,
+    el("span", { class: "spec", text: String(i + 1).padStart(2, "0") + (f.keep ? " · ad " + f.plate : "") }))));
 }
 function renderTest(bumped) { renderDuo(); renderVotes(bumped); renderAnswer(); }
 
@@ -1112,7 +1127,10 @@ if ("IntersectionObserver" in window) new IntersectionObserver(es => es.forEach(
 /* Reveal: the stamp slams down, the proof shakes, ink flies, the room's number counts up. */
 function inkBurst() {
   if (reduce.matches) return;
-  const proof = document.getElementById("proof-" + aiAd().plate), cols = ["var(--cyan)", "var(--magenta)", "var(--yellow)", "var(--red)"];
+  const cols = ["var(--cyan)", "var(--magenta)", "var(--yellow)", "var(--red)"];
+  ADS.filter(a => a.ai).forEach(a => burstOn(document.getElementById("proof-" + a.plate), cols));
+}
+function burstOn(proof, cols) {
   proof.classList.remove("shake"); void proof.offsetWidth; proof.classList.add("shake");
   for (let i = 0; i < 26; i++) {
     const a = i / 26 * 6.2832 + (i % 3) * .4, d = 90 + (i * 37) % 140;
@@ -1130,7 +1148,7 @@ function countUp(node, to) {
 document.getElementById("revealBtn").addEventListener("click", () => {
   if (!state.revealed) return;
   inkBurst();
-  const n = state.A + state.B; if (n) countUp(document.getElementById("sAI"), Math.round(state[aiAd().plate] / n * 100));
+  const n = state.A + state.B; if (n) countUp(document.getElementById("sAI"), 100);
 });
 
 </script>
