@@ -875,8 +875,8 @@ function renderStatic() {
       el("a", { href: o.fact.url, target: "_blank", rel: "noopener", text: o.fact.src })) : null,
     o.preds ? el("ul", { class: "preds" }, o.preds.map(x => el("li", {}, el("b", { text: x.h }), el("p", { text: x.d })))) : null,
     o.rows ? el("div", { class: "tablewrap" }, el("table", { class: "grid slim" },
-      el("thead", {}, el("tr", {}, el("th", { text: "Theme" }), el("th", { text: "What could happen" }), el("th", { text: "Source" }))),
-      el("tbody", {}, o.rows.map(r => el("tr", {}, cell(r.t, "theme"), cell(r.v), cell(r.s, "src")))))) : null)));
+      el("thead", {}, el("tr", {}, el("th", { text: "Theme" }), el("th", { text: "What could happen" }))),
+      el("tbody", {}, o.rows.map(r => el("tr", {}, cell(r.t, "theme"), cell(r.v)))))) : null)));
 
 }
 
