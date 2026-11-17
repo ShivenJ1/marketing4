@@ -659,7 +659,8 @@ const CHANNELS = [
   { id: "social", name: "Social media", stage: "Awareness", owner: "Martin",
     automates: ["Post volume", "Captions", "Trend formats"], human: ["Brand voice", "Community", "Cultural timing"] },
   { id: "content", name: "Content & copywriting", stage: "Consideration", owner: "Emiliano",
-    automates: ["First drafts", "Headline variants", "SEO copy"], human: ["Storytelling", "Editing", "Point of view"] },
+    automates: ["Writing first drafts of advertisements and product descriptions", "Creating different headlines and captions for the same advertisement", "Improving existing writing by making it shorter, clearer, or more persuasive"],
+    human: ["Deciding what the advertisement should communicate to customers", "Choosing the creative direction and the best advertising ideas", "Checking for mistakes and approving the final advertisement"] },
   { id: "search", name: "AI search", stage: "Consideration", owner: "Emiliano",
     automates: ["Answers that replace clicks", "Comparisons", "Keyword research"], human: ["Reputation", "Trust", "Original expertise"] },
   { id: "paid", name: "Paid performance", stage: "Conversion", owner: "Shiven",
@@ -685,6 +686,22 @@ Object.assign(CHANNELS.find(c => c.id === "email").deep, {
     { t: "Marketing specialist", d: "Does the day-to-day work and builds the emails. Keeps the schedule and sending on track, and manages clients or subscribers." }
   ],
   workflow: ["Plan the calendar", "Segment the list", "Write", "Design", "Test", "Send", "Report"].map(step => ({ step, tag: "" }))
+});
+Object.assign(CHANNELS.find(c => c.id === "content").deep, {
+  note: "Planning and writing marketing content, such as advertisements, product descriptions, and articles, to attract customers and promote a company's products.",
+  purpose: [],
+  roles: [
+    { t: "Content strategist", d: "Researches what customers are interested in and plans what content the company should create to reach its marketing goals." },
+    { t: "Copywriter", d: "Creates the written content customers see in advertisements, product descriptions, and other promotional materials." }
+  ],
+  workflow: [
+    { step: "Research the audience and identify what customers need", tag: "Human-led" },
+    { step: "Decide what content to create and what message to communicate", tag: "Human-led" },
+    { step: "Generate first drafts and different versions of the writing", tag: "AI-assisted" },
+    { step: "Check accuracy, improve the wording, and approve the final version", tag: "Human-led" },
+    { step: "Review how the content performs and identify improvements", tag: "AI-assisted" }
+  ],
+  consequence: "By 2030, companies may need fewer people for basic writing tasks. Entry-level copywriters could have fewer opportunities to gain experience as more of their work shifts toward editing and improving AI-generated content."
 });
 Object.assign(CHANNELS.find(c => c.id === "paid").deep, {
   note: "Performance-based and incentive-based. It is made to give gains or rewards tied to milestones, goals and achievements that are established and measured:",
@@ -787,7 +804,7 @@ function channel(c, i) {
         el("div", { class: "ai-col" }, el("span", { class: "spec", text: "AI is taking" }), el("ul", {}, c.automates.map(x => el("li", { text: x })))),
         el("div", {}, el("span", { class: "spec", text: "Stays human" }), el("ul", {}, c.human.map(x => el("li", { text: x })))))),
       row("What it's for", el("div", {}, d.note ? txt(d.note) : null,
-        el(d.plain ? "ul" : "ol", { class: "goals" + (d.plain ? " plain" : "") }, d.purpose.map(x => el("li", { class: isTodo(x) ? "todo" : "", text: x }))))),
+        d.purpose.length === 0 ? null : el(d.plain ? "ul" : "ol", { class: "goals" + (d.plain ? " plain" : "") }, d.purpose.map(x => el("li", { class: isTodo(x) ? "todo" : "", text: x }))))),
       row("Roles today", el("div", {}, el("div", { class: "roles" }, d.roles.map(r => el("div", { class: "role" },
         el("b", { class: isTodo(r.t) ? "todo" : "", text: r.t }), txt(r.d)))),
         d.rolesNote ? el("p", { class: "roles-note", text: d.rolesNote }) : null)),
