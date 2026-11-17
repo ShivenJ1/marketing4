@@ -530,7 +530,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
     <div>
       <p class="spec">DMD 2030 · Final project · UConn Stamford</p>
       <h1>When AI can make the ad, what is the marketer for?</h1>
-      <p class="lead">We split marketing into six channels and asked the same questions of each: who does the work today, which tasks AI is taking over, and what could change by 2035. At the end there are two ads. One was made by AI. You decide which.</p>
+      <p class="lead">We split marketing into six channels and asked the same questions of each: who does the work today, which tasks AI is taking over, and what could change by 2031. At the end there are two ads. One was made by AI. You decide which.</p>
       <div class="cta-row">
         <a class="btn solid" href="#channels">Start with the channels</a>
         <a class="textlink" href="#test">Go to voting</a>
@@ -539,7 +539,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
     <aside class="docket" aria-label="Project details">
       <div class="docket-head"><b>JOB DOCKET</b><b>2030</b></div>
       <dl>
-        <div class="r"><dt>Question</dt><dd>How does AI change marketing work by 2035?</dd></div>
+        <div class="r"><dt>Question</dt><dd>How does AI change marketing work by 2031?</dd></div>
         <div class="r"><dt>Domain</dt><dd>Marketing, in six channels</dd></div>
         <div class="r"><dt>Tool tested</dt><dd>Claude, by Anthropic</dd></div>
         <div class="r"><dt>Team</dt><dd id="docketTeam"></dd></div>
@@ -575,11 +575,11 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
 </section>
 
 <section class="sec" id="outlook" aria-labelledby="ol-h">
-  <span class="ghost" aria-hidden="true">2035</span>
+  <span class="ghost" aria-hidden="true">2031</span>
   <div class="wrap">
     <div class="sec-head rv">
       <h2 id="ol-h">What could happen to marketing next.</h2>
-      <p class="lead">Industry-wide, beyond any one channel. Our group's predictions, in two horizons: one to three years, and five to nine.</p>
+      <p class="lead">Industry-wide, beyond any one channel. Our group's predictions, in two horizons: one to three years, and three to five.</p>
     </div>
     <div class="tl" id="tl">
       <div class="spine" aria-hidden="true"><i></i></div>
@@ -815,17 +815,16 @@ const OUTLOOK = [
   { when: "Now · 2026", title: "Where it stands", text: "AI is already inside most agency work. The open question is what it takes over next.",
     fact: { big: "9 in 10", text: "US marketing agencies use generative AI.", src: "Forrester × 4As, 2026",
       url: "https://investor.forrester.com/news-releases/news-release-details/forrester-nine-10-us-marketing-agencies-use-ai-cut-costs-expense" } },
-  { when: "Short-term · 1–3 years · 2027–2029", title: "Ads you have to engage with",
-    preds: [
-      { h: "Watch an ad to get your meal", d: "To get a free meal or a discount, customers must watch and interact with an ad." },
-      { h: "Controversial on purpose", d: "Ads will start to become controversial on purpose to gain publicity and attention." }
-    ] },
-  { when: "Long-term · 5–9 years · 2031–2035", title: "Ads inside your head", text: "Since AI is growing faster every day, anything is possible.",
-    preds: [
-      { h: "Neuralink", d: "Technology that connects the human brain with computers. It allows people with paralysis to communicate their thoughts through computers." },
-      { h: "Ads in the brain", d: "It is still being tested and investigated. In a few years, as people study and encourage this invention, there may be companies inputting ads into it, reaching customers directly inside their own thoughts." }
-    ] }
+  { when: "Short-term · 1–3 years · 2027–2029", title: "Ads you have to engage with", text: "[One sentence summing up the next three years]",
+    rows: THEMES.map(t => ({ t, v: "[What could happen]", s: "[Source]" })) },
+  { when: "Medium-term · 3–5 years · 2029–2031", title: "Ads inside your head", text: "Since AI is growing faster every day, anything is possible.",
+    rows: THEMES.map(t => ({ t, v: "[What could happen]", s: "[Source]" })) }
 ];
+/* The group's predictions, placed in the theme they fit best */
+const fillTheme = (stage, theme, v) => Object.assign(OUTLOOK[stage].rows.find(r => r.t === theme), { v });
+fillTheme(1, "Consumers & trust", "Customers must watch and interact with an ad to get a free meal or a discount.");
+fillTheme(1, "Search & discovery", "Ads will start to become controversial on purpose to gain publicity and attention.");
+fillTheme(2, "Tools & workflow", "Neuralink connects the human brain with computers, letting people with paralysis communicate their thoughts. As it is studied and encouraged, companies may start inputting ads into it, reaching customers directly inside their own thoughts.");
 
 
 /* ============ Rendering ============ */
