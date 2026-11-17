@@ -429,6 +429,19 @@ table.grid td.n span { display: inline-grid; place-items: center; width: 40px; h
   @keyframes nudge { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(3px); } }
 }
 
+/* ===== Scan to vote ===== */
+.scan { position: relative; overflow: hidden; padding-block: 96px; margin-top: 104px; }
+.scan .halftone { left: -40px; bottom: -40px; width: 420px; height: 320px; opacity: .3;
+  -webkit-mask-image: radial-gradient(circle at 0 100%, #000 15%, transparent 70%); mask-image: radial-gradient(circle at 0 100%, #000 15%, transparent 70%); }
+.scan-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px 64px; align-items: center; }
+.scan h2 { font-size: clamp(44px, 6.4vw, 88px); margin: 12px 0 16px; }
+.scan .lead { color: var(--k); }
+.scan-url { margin-top: 20px; font-family: var(--mono); font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
+.qr-card { margin: 0; background: #FFFFFF; border: 2px solid var(--k); box-shadow: 10px 10px 0 var(--k); padding: 22px; transform: rotate(2deg); }
+.qr { width: min(320px, 70vw); aspect-ratio: 1; }
+.qr svg { display: block; width: 100%; height: 100%; }
+@media (max-width: 760px) { .scan-grid { grid-template-columns: minmax(0, 1fr); justify-items: start; } .qr-card { transform: none; } }
+
 /* ===== Motion layer ===== */
 .hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .hero h1 { font-weight: 800; }
@@ -603,6 +616,21 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
   </div>
 </section>
 
+<section class="scan band-y" id="scan" aria-labelledby="scan-h">
+  <div class="halftone" aria-hidden="true"></div>
+  <div class="wrap scan-grid">
+    <div class="rv">
+      <p class="spec">Vote on your phone</p>
+      <h2 id="scan-h">Scan to vote.</h2>
+      <p class="lead">Point your camera at the code. It opens this site right at the vote.</p>
+      <p class="scan-url" id="scanUrl"></p>
+    </div>
+    <figure class="qr-card rv" style="--d:1">
+      <div class="qr" id="qr" role="img" aria-label="QR code that opens the vote"></div>
+    </figure>
+  </div>
+</section>
+
 <section class="test" id="test" aria-labelledby="test-h">
   <div class="halftone" aria-hidden="true"></div>
   <div class="wrap">
@@ -646,6 +674,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
   </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script>
 /* ============ CONTENT: edit here. Anything in [brackets] shows as a placeholder. ============ */
 
@@ -1036,6 +1065,17 @@ async function connect() {
   }, 2500);
 }
 
+/* ============ Scan to vote ============
+   The code is built from this page's own address, minus any ?host= password, and lands on the vote. */
+function renderQR() {
+  const url = location.origin + location.pathname.replace(/index\.html$/, "") + "#test";
+  const label = document.getElementById("scanUrl"), box = document.getElementById("qr");
+  label.textContent = url.replace(/^https?:\/\//, "").replace(/\/?#test$/, "");
+  if (typeof window.qrcode !== "function") return;
+  const q = window.qrcode(0, "M"); q.addData(url); q.make();
+  box.innerHTML = q.createSvgTag({ cellSize: 8, margin: 0, scalable: true });
+}
+
 /* ============ Motion + nav ============ */
 const reduce = matchMedia("(prefers-reduced-motion: reduce)");
 function watch() {
@@ -1065,6 +1105,7 @@ addEventListener("resize", fill);
 
 renderStatic();
 connect();
+renderQR();
 renderTest();
 watch();
 fill();
