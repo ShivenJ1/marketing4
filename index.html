@@ -748,7 +748,17 @@ Object.assign(CHANNELS.find(c => c.id === "email").deep, {
     { t: "Email marketing manager", d: "Leads and oversees the overall strategy and planning: dates and goals, and automating the system while keeping to a budget." },
     { t: "Marketing specialist", d: "Does the day-to-day work and builds the emails. Keeps the schedule and sending on track, and manages clients or subscribers." }
   ],
-  workflow: ["Plan the calendar", "Segment the list", "Write", "Design", "Test", "Send", "Report"].map(step => ({ step, tag: "" }))
+  workflow: [
+    { step: "Plan the calendar", tag: "Human-led" },
+    { step: "Segment the list", tag: "Automated" },
+    { step: "Write", tag: "AI-assisted" },
+    { step: "Design", tag: "AI-assisted" },
+    { step: "Test", tag: "Automated" },
+    { step: "Send", tag: "Automated" },
+    { step: "Report", tag: "AI-assisted" }
+  ],
+  tested: "We asked Claude to write a welcome email for a new subscriber. It was ready in seconds, but a person had to cut the generic lines and fix the tone to match the brand.",
+  consequence: "Inboxes fill up with emails that know too much, so people feel watched and stop opening them."
 });
 Object.assign(CHANNELS.find(c => c.id === "content").deep, {
   noTest: true,
