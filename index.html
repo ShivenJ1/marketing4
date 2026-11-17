@@ -695,6 +695,15 @@ Object.assign(CHANNELS.find(c => c.id === "paid").deep, {
     { t: "Affiliate / partnerships manager", d: "Partners get paid only when they drive a sale, earning a commission. The manager checks their performance, adjusts commission rates, and has talks with partners." }
   ],
   noTest: true,
+  workflow: [
+    { step: "Set the goal", tag: "Human-led" },
+    { step: "Set budget and rates", tag: "Human-led" },
+    { step: "Build campaigns", tag: "AI-assisted" },
+    { step: "Launch and bid", tag: "Automated" },
+    { step: "Track daily", tag: "Automated" },
+    { step: "Adjust", tag: "AI-assisted" },
+    { step: "Pay out and report", tag: "Human-led" }
+  ],
   rolesNote: "Both roles relate to paid performance: they check paid performance analytics, which can apply to things like apps and creators, and adjust rates from what they find."
 });
 
