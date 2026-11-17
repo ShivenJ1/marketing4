@@ -546,7 +546,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
   <div class="wrap">
     <div class="sec-head rv">
       <h2 id="ff-h">The tool we tested: Claude.</h2>
-      <p class="lead">Anthropic's AI assistant. We tested it on the kind of work marketers do every day. The AI ad at the end came from Adobe Firefly, because Claude doesn't make photographs.</p>
+      <p class="lead">Anthropic's AI assistant. We tested it on the kind of work marketers do every day. The AI ad at the end was made with ChatGPT, because Claude doesn't make images.</p>
     </div>
     <div class="rows" id="ffRows"></div>
   </div>
@@ -582,7 +582,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
   <div class="wrap">
     <div class="sec-head rv">
       <h2 id="test-h">Two ads. One is AI.</h2>
-      <p class="lead">One was made by a person, one by Adobe Firefly. Look at both for ten seconds, then raise a hand for the one you think is AI.</p>
+      <p class="lead">One was made by a person, one by ChatGPT. Look at both for ten seconds, then raise a hand for the one you think is AI.</p>
     </div>
     <div class="duo" id="duo"></div>
     <div class="test-actions rv" style="--d:3">
@@ -597,7 +597,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
       <div class="stat"><b>70%</b><p>Of consumers say they can spot AI-generated ads (Canva, 2026)</p></div>
     </div>
     <div class="sheet" id="sheet" hidden>
-      <div class="sheet-head"><h3>Every Firefly image we threw away</h3><span class="spec" id="sheetSpec"></span></div>
+      <div class="sheet-head"><h3>Every ChatGPT image we threw away</h3><span class="spec" id="sheetSpec"></span></div>
       <div class="contacts" id="contacts"></div>
     </div>
   </div>
@@ -632,7 +632,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
    Put the image files next to index.html and set src, e.g. "ad-a.jpg". */
 const ADS = [
   { plate: "A", ai: true, src: "", format: "[Format, e.g. Instagram post]", ratio: "4:5",
-    prompt: "[Paste the exact Firefly prompt]", attempts: "[N]",
+    prompt: "[Paste the exact ChatGPT prompt]", attempts: "[N]",
     notes: ["[Direction note from the group, e.g. too generic]", "[Another note]", "[Another note]"],
     rejects: ["", "", "", "", "", "", "", "", "", "", ""] },          /* image paths of the throwaways */
   { plate: "B", ai: false, src: "", format: "[Format, e.g. Instagram post]", ratio: "4:5",
@@ -647,7 +647,7 @@ const PLATFORM = [
   { k: "How it changes the job", v: ["First drafts, research summaries and page builds move to the AI.",
     "The marketer's work shifts to writing the brief, judging what comes back, and fixing what's wrong."] },
   { k: "What we tested", v: ["We gave it real marketing tasks from this project: finding and summarizing the industry reports we cite, planning work across a team of six, and drafting research templates for each channel."] },
-  { k: "Where it fell short", v: ["It can't make photographs, so the AI ad came from Adobe Firefly.",
+  { k: "Where it fell short", v: ["It can't make images, so the AI ad was made with ChatGPT.",
     "Its first drafts looked and sounded like everything else AI makes. Getting something distinctive took many rounds of our direction.",
     "It couldn't confirm every number: one report is behind a paywall, and one statistic came from a secondhand source.",
     "Its drafts sounded right but were generic. The real roles and examples came from our own research."] }
@@ -675,7 +675,7 @@ CHANNELS.forEach(c => {
     purpose: ["[Goal of this channel, in plain words]"],
     roles: [{ t: "[Job title]", d: "[What this person does day to day]" }, { t: "[Job title]", d: "[What this person does day to day]" }],
     workflow: "[List the steps of the job in order, then tag each one: human-led, AI-assisted or automated]",
-    tested: "[One real task we tried with Claude or Firefly: what we asked, what came back, what a person had to fix]",
+    tested: "[One real task we tried with Claude or ChatGPT: what we asked, what came back, what a person had to fix]",
     consequence: "[One unintended outcome for the people in these roles]"
   };
 });
@@ -852,13 +852,13 @@ function renderDuo() {
     const kids = [el("span", { class: "plate", text: ad.plate }),
       ad.src ? el("img", { src: ad.src, alt: "Ad " + ad.plate })
              : el("div", { class: "ph" }, el("div", {}, el("b", { text: ad.plate }), el("span", { class: "spec", text: "Ad " + ad.plate + " goes here" })))];
-    if (state.revealed) kids.push(el("div", { class: "stamp" + (ad.ai ? "" : " human"), text: ad.ai ? "AI · ADOBE FIREFLY" : "HUMAN" }));
+    if (state.revealed) kids.push(el("div", { class: "stamp" + (ad.ai ? "" : " human"), text: ad.ai ? "AI · CHATGPT" : "HUMAN" }));
     return el("div", { class: "pick rv" + (state.revealed && ad.ai ? " won" : ""), style: "--d:" + (i + 1) },
       el("figure", { class: "proof-fig" },
         el("div", { class: "proof", id: "proof-" + ad.plate },
           el("span", { class: "cm tl" }), el("span", { class: "cm tr" }), el("span", { class: "cm bl" }), el("span", { class: "cm br" }),
           el("div", { class: "ad", style: "aspect-ratio:" + ad.ratio.replace(":", " / ") }, kids)),
-        el("figcaption", { class: "spec", text: [ad.format, ad.ratio, state.revealed ? (ad.ai ? "Made with Adobe Firefly" : "Made by a person") : "Maker withheld"].join(" · ") })),
+        el("figcaption", { class: "spec", text: [ad.format, ad.ratio, state.revealed ? (ad.ai ? "Made with ChatGPT" : "Made by a person") : "Maker withheld"].join(" · ") })),
       el("button", { class: "vote", id: "v" + ad.plate, type: "button", "aria-label": "Vote that ad " + ad.plate + " is AI",
         onclick: () => vote(ad.plate) }, el("span", { text: ad.plate + " is AI" }), el("b", { id: "c" + ad.plate, text: String(state[ad.plate]) })));
   }));
@@ -881,7 +881,7 @@ function renderAnswer() {
   box.replaceChildren(...ADS.map(ad => ad.ai
     ? el("div", { class: "answer" },
         el("span", { class: "spec", text: "Ad " + ad.plate + ": AI" }),
-        el("p", {}, "Made with Adobe Firefly. We kept 1 of ", el("b", { class: isTodo(ad.attempts) ? "todo" : "", text: ad.attempts }), " attempts."),
+        el("p", {}, "Made with ChatGPT. We kept 1 of ", el("b", { class: isTodo(ad.attempts) ? "todo" : "", text: ad.attempts }), " attempts."),
         el("div", {}, el("span", { class: "spec", text: "The prompt" }), todoP(ad.prompt, "prompt")),
         el("div", {}, el("span", { class: "spec", text: "Our direction notes" }), el("ul", { class: "markup" }, ad.notes.map(x => el("li", { text: x })))))
     : el("div", { class: "answer human" },
