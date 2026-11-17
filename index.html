@@ -146,6 +146,9 @@ table.grid td.tag { width: 200px; }
 .roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 32px; }
 .role b { display: block; margin-bottom: 4px; }
 .role p { color: var(--muted); font-size: 15.5px; }
+.tested { display: flex; flex-direction: column; gap: 10px; }
+.tested ul { margin: 4px 0 0; padding-left: 20px; }
+.tested .prompt { font-family: var(--mono); font-size: 13px; background: var(--sheet); border: 1px solid var(--line); padding: 10px 12px; margin-top: 4px; }
 .roles-note { margin-top: 16px !important; padding-top: 14px; border-top: 1px dashed var(--line); font-size: 15.5px; }
 .flow { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 6px; align-items: center; }
 .flow li { display: flex; align-items: center; gap: 6px; }
@@ -657,7 +660,8 @@ const CHANNELS = [
   { id: "brand", name: "Brand advertising", stage: "Awareness", owner: "Elizabeth",
     automates: ["Concept visuals", "Variations", "Resizing"], human: ["The big idea", "Taste", "Brand consistency"] },
   { id: "social", name: "Social media", stage: "Awareness", owner: "Martin",
-    automates: ["Post volume", "Captions", "Trend formats"], human: ["Brand voice", "Community", "Cultural timing"] },
+    automates: ["Post creation", "Captions and hashtags", "Trend research", "Video editing", "Content scheduling", "Audience analytics"],
+    human: ["Brand voice", "Creative direction", "Community relationships", "Cultural awareness", "Ethical decisions"] },
   { id: "content", name: "Content & copywriting", stage: "Consideration", owner: "Emiliano",
     automates: ["Writing first drafts of advertisements and product descriptions", "Creating different headlines and captions for the same advertisement", "Improving existing writing by making it shorter, clearer, or more persuasive"],
     human: ["Deciding what the advertisement should communicate to customers", "Choosing the creative direction and the best advertising ideas", "Checking for mistakes and approving the final advertisement"] },
@@ -703,6 +707,30 @@ Object.assign(CHANNELS.find(c => c.id === "content").deep, {
     { step: "Review how the content performs and identify improvements", tag: "AI-assisted" }
   ],
   consequence: "By 2030, companies may need fewer people for basic writing tasks. Entry-level copywriters could have fewer opportunities to gain experience as more of their work shifts toward editing and improving AI-generated content."
+});
+Object.assign(CHANNELS.find(c => c.id === "social").deep, {
+  note: "Brands use social media to get noticed, earn trust, and turn followers into customers. AI is changing how fast they can do it and how many people they can reach.",
+  purpose: [],
+  roles: [
+    { t: "Social media manager", d: "Manages social media accounts, plans campaigns, researches trends, monitors engagement, and develops marketing strategies." },
+    { t: "Content creator", d: "Creates photos, videos, graphics, captions, and promotional content while maintaining a company's visual identity." }
+  ],
+  workflow: [
+    { step: "Research target audience", tag: "AI-assisted" },
+    { step: "Develop campaign strategy", tag: "Human-led" },
+    { step: "Create promotional content", tag: "AI-assisted" },
+    { step: "Review and approve content", tag: "Human-led" },
+    { step: "Schedule and publish posts", tag: "Automated" },
+    { step: "Analyze engagement", tag: "AI-assisted" },
+    { step: "Adjust marketing strategy", tag: "Human-led" }
+  ],
+  tested: [
+    { k: "Experiment:", v: "An AI-powered social media campaign. We used Claude to create a simple Instagram campaign for McDonald's promoting its new burger." },
+    { k: "Prompt used", mono: true, v: "Create a simple Instagram advertising campaign for McDonald's promoting a new burger. Include a catchy slogan, a short caption, and one creative advertising idea." },
+    { k: "What AI generated", v: ["Creative burger ad ideas and backgrounds", "Catchy slogans and captions", "Influencer promotion ideas", "Instagram post designs", "Ideas to attract younger customers"] },
+    { k: "What humans had to fix", v: ["Choose the best idea", "Match McDonald's brand", "Review and approve the ad"] }
+  ],
+  consequence: "Loss of entry-level creative jobs. As AI becomes capable of generating captions, editing videos, and creating promotional content, companies may need fewer entry-level social media creators. This could make it harder for new marketing professionals to gain experience and enter the industry."
 });
 Object.assign(CHANNELS.find(c => c.id === "search").deep, {
   note: "Helping customers discover a company through search engines like Google and AI-generated answers from tools like ChatGPT.",
@@ -835,7 +863,10 @@ function channel(c, i) {
         ? el("ol", { class: "flow" }, d.workflow.map(x => el("li", {}, el("span", { class: "st" },
             el("span", { class: "fs", text: x.step }), el("span", { class: "ft" + tagCls(x.tag), text: x.tag || "Untagged" })))))
         : txt(d.workflow)),
-      d.noTest ? null : row("We tested it", Array.isArray(d.tested) ? el("div", {}, d.tested.map(x => el("p", {}, el("b", { text: x.k + " " }), x.v))) : txt(d.tested)),
+      d.noTest ? null : row("We tested it", Array.isArray(d.tested) ? el("div", { class: "tested" }, d.tested.map(x => Array.isArray(x.v)
+          ? el("div", {}, el("b", { text: x.k }), el("ul", {}, x.v.map(t => el("li", { text: t }))))
+          : x.mono ? el("div", {}, el("b", { text: x.k }), el("p", { class: "prompt", text: x.v }))
+          : el("p", {}, el("b", { text: x.k + " " }), x.v))) : txt(d.tested)),
       row("Unintended consequence", txt(d.consequence))));
 }
 
