@@ -959,7 +959,7 @@ function renderDuo() {
     const btn = el("button", { class: "vote" + (mine === ad.plate ? " mine" : ""), id: "v" + ad.plate, type: "button",
         "aria-label": "Vote that ad " + ad.plate + " is AI", onclick: () => vote(ad.plate) },
       el("span", { text: ad.plate + " is AI" }), el("b", { id: "c" + ad.plate, text: String(state[ad.plate]) }));
-    if (mine) btn.disabled = true;
+    if (state.revealed) btn.disabled = true;
     return el("div", { class: "pick rv" + (state.revealed && ad.ai ? " won" : ""), style: "--d:" + (i + 1) },
       el("figure", { class: "proof-fig" + (shape(ad) < 1 ? " tall" : shape(ad) > 1.2 ? " wide" : "") },
         el("div", { class: "proof", id: "proof-" + ad.plate },
@@ -977,7 +977,7 @@ function renderVotes(bumped) {
 }
 function renderControls() {
   const mine = myVote(), status = document.getElementById("voteStatus");
-  status.textContent = state.revealed ? "" : mine ? "You voted " + mine + ". Watch the screen for the answer." : "Tap the ad you think is AI. One vote per device.";
+  status.textContent = state.revealed ? "" : mine ? "You voted " + mine + ". Tap " + (mine === "A" ? "B" : "A") + " to change your vote." : "Tap the ad you think is AI. One vote per device.";
   const rb = document.getElementById("revealBtn"), reset = document.getElementById("resetBtn");
   rb.hidden = remote && !isHost();
   rb.textContent = state.revealed ? "Hide the answer" : "Reveal the answer";
@@ -1028,11 +1028,15 @@ function apply(t) {
   if (t.revealed && !wasRevealed) celebrate();
 }
 async function vote(k) {
-  if (myVote()) return;
+  const prev = myVote();
+  if (state.revealed || prev === k) return;
   me = { id: me.id, choice: k, round }; saveMe();
   if (remote) {
     try { apply(await api({ action: "vote", choice: k, id: me.id })); } catch (e) {}
-  } else { state[k]++; save(); }
+  } else {
+    if (prev) state[prev] = Math.max(0, state[prev] - 1);
+    state[k]++; save();
+  }
   renderDuo(); renderVotes("c" + k); renderControls();
 }
 document.getElementById("revealBtn").addEventListener("click", async () => {

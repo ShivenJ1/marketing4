@@ -35,11 +35,16 @@ module.exports = async (req, res) => {
     if (b.action === "vote") {
       const choice = b.choice, id = String(b.id || "");
       if (!["A", "B"].includes(choice) || !/^[A-Za-z0-9-]{8,64}$/.test(id)) return res.status(400).json({ error: "bad_vote" });
-      const round = Number(await redis("get", "stm:round")) || 0;
-      // one vote per device per round: the first SET wins, later ones are ignored
-      const ok = await redis("set", "stm:voter:" + round + ":" + id, choice, "NX", "EX", "86400");
-      if (ok === "OK") await redis("incr", "stm:" + choice);
-      return res.status(200).json({ ...(await readState()), accepted: ok === "OK" });
+      const now = await readState();
+      if (now.revealed) return res.status(200).json({ ...now, accepted: false });
+      // one vote per device per round; voting for the other ad moves the vote instead of adding one
+      const key = "stm:voter:" + now.round + ":" + id;
+      const prev = await redis("get", key);
+      if (prev === choice) return res.status(200).json({ ...now, accepted: false });
+      await redis("set", key, choice, "EX", "86400");
+      if (prev === "A" || prev === "B") await redis("decr", "stm:" + prev);
+      await redis("incr", "stm:" + choice);
+      return res.status(200).json({ ...(await readState()), accepted: true });
     }
 
     if (!HOST || b.key !== HOST) return res.status(403).json({ error: "not_host" });
