@@ -368,7 +368,9 @@ table.grid td.n span { display: inline-grid; place-items: center; width: 40px; h
 }
 
 /* ===== Two-ad test ===== */
-.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 56px; margin-top: 48px; }
+.duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 56px; margin-top: 48px; align-items: end; }
+.pick .proof-fig.tall { max-width: 330px; }
+.duo-note { text-align: center; margin-top: 18px; }
 .pick { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 .pick .proof-fig { max-width: 460px; }
 .plate { position: absolute; top: 10px; left: 10px; z-index: 1; width: 44px; height: 44px; display: grid; place-items: center;
@@ -602,6 +604,7 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
       <p class="lead">One was made by a person, one by ChatGPT. Look at both for ten seconds, then raise a hand for the one you think is AI.</p>
     </div>
     <div class="duo" id="duo"></div>
+    <p class="note duo-note">Student concept ads made for a class project. Not affiliated with or endorsed by Apple.</p>
     <div class="test-actions rv" style="--d:3">
       <button class="btn solid" id="revealBtn" type="button" aria-pressed="false">Reveal the answer</button>
       <button class="linkbtn" id="undoBtn" type="button">Undo last vote</button>
@@ -648,11 +651,11 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
 /* The two ads. The page tells the room one is AI. The trick: both are.
    Put the image files next to index.html and set src, e.g. "ad-a.jpg". */
 const ADS = [
-  { plate: "A", ai: true, src: "", format: "[Format, e.g. Instagram post]", ratio: "4:5",
+  { plate: "A", ai: true, src: "ad-a.jpg", format: "Print ad", ratio: "3:2",
     prompt: "[Paste the exact ChatGPT prompt]", attempts: "[N]",
     notes: ["[Direction note from the group, e.g. too generic]", "[Another note]", "[Another note]"],
     rejects: ["", "", "", "", "", "", "", "", "", "", ""] },          /* image paths of the throwaways */
-  { plate: "B", ai: true, src: "", format: "[Format, e.g. Instagram post]", ratio: "4:5",
+  { plate: "B", ai: true, src: "ad-b.jpg", format: "Poster", ratio: "2:3",
     prompt: "[Paste the exact ChatGPT prompt]", attempts: "[N]",
     notes: ["[Direction note from the group]", "[Another note]"],
     rejects: [] }
@@ -934,7 +937,7 @@ function renderDuo() {
              : el("div", { class: "ph" }, el("div", {}, el("b", { text: ad.plate }), el("span", { class: "spec", text: "Ad " + ad.plate + " goes here" })))];
     if (state.revealed) kids.push(el("div", { class: "stamp" + (ad.ai ? "" : " human"), text: ad.ai ? "AI · CHATGPT" : "HUMAN" }));
     return el("div", { class: "pick rv" + (state.revealed && ad.ai ? " won" : ""), style: "--d:" + (i + 1) },
-      el("figure", { class: "proof-fig" },
+      el("figure", { class: "proof-fig" + (ad.ratio.split(":")[0] / ad.ratio.split(":")[1] < 1 ? " tall" : "") },
         el("div", { class: "proof", id: "proof-" + ad.plate },
           el("span", { class: "cm tl" }), el("span", { class: "cm tr" }), el("span", { class: "cm bl" }), el("span", { class: "cm br" }),
           el("div", { class: "ad", style: "aspect-ratio:" + ad.ratio.replace(":", " / ") }, kids)),
