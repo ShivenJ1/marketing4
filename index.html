@@ -146,6 +146,7 @@ table.grid td.tag { width: 200px; }
 .roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 32px; }
 .role b { display: block; margin-bottom: 4px; }
 .role p { color: var(--muted); font-size: 15.5px; }
+.roles-note { margin-top: 16px !important; padding-top: 14px; border-top: 1px dashed var(--line); font-size: 15.5px; }
 .flow { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 6px; align-items: center; }
 .flow li { display: flex; align-items: center; gap: 6px; }
 .flow li + li::before { content: "\2192"; color: var(--muted); }
@@ -688,7 +689,12 @@ Object.assign(CHANNELS.find(c => c.id === "email").deep, {
 Object.assign(CHANNELS.find(c => c.id === "paid").deep, {
   note: "Performance-based and incentive-based. It is made to give gains or rewards tied to milestones, goals and achievements that are established and measured:",
   purpose: ["Establish the milestones and goals up front", "Measure each achievement and reward it"],
-  plain: true
+  plain: true,
+  roles: [
+    { t: "Performance marketing manager", d: "Checks cost per acquisition (what it costs to get one customer) or return on ad spend. They check the numbers and performance every day, and adjust the budget based on those numbers." },
+    { t: "Affiliate / partnerships manager", d: "Partners get paid only when they drive a sale, earning a commission. The manager checks their performance, adjusts commission rates, and has talks with partners." }
+  ],
+  rolesNote: "Both roles relate to paid performance: they check paid performance analytics, which can apply to things like apps and creators, and adjust rates from what they find."
 });
 
 const THEMES = ["Jobs & roles", "Tools & workflow", "Agencies & budgets", "Search & discovery", "Consumers & trust", "Rules & regulation"];
@@ -771,8 +777,9 @@ function channel(c, i) {
         el("div", {}, el("span", { class: "spec", text: "Stays human" }), el("ul", {}, c.human.map(x => el("li", { text: x })))))),
       row("What it's for", el("div", {}, d.note ? txt(d.note) : null,
         el(d.plain ? "ul" : "ol", { class: "goals" + (d.plain ? " plain" : "") }, d.purpose.map(x => el("li", { class: isTodo(x) ? "todo" : "", text: x }))))),
-      row("Roles today", el("div", { class: "roles" }, d.roles.map(r => el("div", { class: "role" },
-        el("b", { class: isTodo(r.t) ? "todo" : "", text: r.t }), txt(r.d))))),
+      row("Roles today", el("div", {}, el("div", { class: "roles" }, d.roles.map(r => el("div", { class: "role" },
+        el("b", { class: isTodo(r.t) ? "todo" : "", text: r.t }), txt(r.d)))),
+        d.rolesNote ? el("p", { class: "roles-note", text: d.rolesNote }) : null)),
       row("Workflow", Array.isArray(d.workflow)
         ? el("ol", { class: "flow" }, d.workflow.map(x => el("li", {}, el("span", { class: "st" },
             el("span", { class: "fs", text: x.step }), el("span", { class: "ft" + tagCls(x.tag), text: x.tag || "Untagged" })))))
