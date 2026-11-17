@@ -694,6 +694,7 @@ Object.assign(CHANNELS.find(c => c.id === "paid").deep, {
     { t: "Performance marketing manager", d: "Checks cost per acquisition (what it costs to get one customer) or return on ad spend. They check the numbers and performance every day, and adjust the budget based on those numbers." },
     { t: "Affiliate / partnerships manager", d: "Partners get paid only when they drive a sale, earning a commission. The manager checks their performance, adjusts commission rates, and has talks with partners." }
   ],
+  noTest: true,
   rolesNote: "Both roles relate to paid performance: they check paid performance analytics, which can apply to things like apps and creators, and adjust rates from what they find."
 });
 
@@ -784,7 +785,7 @@ function channel(c, i) {
         ? el("ol", { class: "flow" }, d.workflow.map(x => el("li", {}, el("span", { class: "st" },
             el("span", { class: "fs", text: x.step }), el("span", { class: "ft" + tagCls(x.tag), text: x.tag || "Untagged" })))))
         : txt(d.workflow)),
-      row("We tested it", txt(d.tested)),
+      d.noTest ? null : row("We tested it", txt(d.tested)),
       row("Unintended consequence", txt(d.consequence))));
 }
 
