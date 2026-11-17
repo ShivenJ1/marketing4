@@ -973,7 +973,7 @@ function renderVotes(bumped) {
 }
 function renderControls() {
   const mine = myVote(), status = document.getElementById("voteStatus");
-  status.textContent = state.revealed ? "" : mine ? "You voted " + mine + ". Tap " + (mine === "A" ? "B" : "A") + " to change your vote." : "Tap the ad you think is AI. One vote per device.";
+  status.textContent = state.revealed ? "" : mine ? "You voted " + mine + "." : "Tap the ad you think is AI. One vote per device.";
   const rb = document.getElementById("revealBtn"), reset = document.getElementById("resetBtn");
   rb.hidden = remote && !isHost();
   rb.textContent = state.revealed ? "Hide the answer" : "Reveal the answer";
