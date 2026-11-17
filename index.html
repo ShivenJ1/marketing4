@@ -142,6 +142,7 @@ table.grid td.tag { width: 200px; }
 .glance ul { margin: 4px 0 0; padding-left: 18px; }
 .glance .ai-col .spec { color: var(--red); }
 .goals { margin: 8px 0 0; padding-left: 22px; font-weight: 600; }
+.goals.plain { list-style: none; padding-left: 0; }
 .roles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 32px; }
 .role b { display: block; margin-bottom: 4px; }
 .role p { color: var(--muted); font-size: 15.5px; }
@@ -686,7 +687,8 @@ Object.assign(CHANNELS.find(c => c.id === "email").deep, {
 });
 Object.assign(CHANNELS.find(c => c.id === "paid").deep, {
   note: "Performance-based and incentive-based. It is made to give gains or rewards tied to milestones, goals and achievements that are established and measured:",
-  purpose: ["Establish the milestones and goals up front", "Measure each achievement and reward it"]
+  purpose: ["Establish the milestones and goals up front", "Measure each achievement and reward it"],
+  plain: true
 });
 
 const THEMES = ["Jobs & roles", "Tools & workflow", "Agencies & budgets", "Search & discovery", "Consumers & trust", "Rules & regulation"];
@@ -768,7 +770,7 @@ function channel(c, i) {
         el("div", { class: "ai-col" }, el("span", { class: "spec", text: "AI is taking" }), el("ul", {}, c.automates.map(x => el("li", { text: x })))),
         el("div", {}, el("span", { class: "spec", text: "Stays human" }), el("ul", {}, c.human.map(x => el("li", { text: x })))))),
       row("What it's for", el("div", {}, d.note ? txt(d.note) : null,
-        el("ol", { class: "goals" }, d.purpose.map(x => el("li", { class: isTodo(x) ? "todo" : "", text: x }))))),
+        el(d.plain ? "ul" : "ol", { class: "goals" + (d.plain ? " plain" : "") }, d.purpose.map(x => el("li", { class: isTodo(x) ? "todo" : "", text: x }))))),
       row("Roles today", el("div", { class: "roles" }, d.roles.map(r => el("div", { class: "role" },
         el("b", { class: isTodo(r.t) ? "todo" : "", text: r.t }), txt(r.d))))),
       row("Workflow", Array.isArray(d.workflow)
