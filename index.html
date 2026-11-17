@@ -370,6 +370,8 @@ table.grid td.n span { display: inline-grid; place-items: center; width: 40px; h
 /* ===== Two-ad test ===== */
 .duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 56px; margin-top: 48px; align-items: end; }
 .pick .proof-fig.tall { max-width: 330px; }
+.pick .proof-fig.wide { max-width: none; }
+.pick .proof-fig.wide + .vote { max-width: 520px; }
 .duo-note { text-align: center; margin-top: 18px; }
 .pick { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 .pick .proof-fig { max-width: 460px; }
@@ -389,7 +391,8 @@ table.grid td.n span { display: inline-grid; place-items: center; width: 40px; h
 .answers .answer.human .spec { color: var(--aqua-ink); }
 @media (max-width: 640px) {
   .duo, .answers { gap: 16px; }
-  .duo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .duo { grid-template-columns: minmax(0, 1fr) !important; gap: 40px; }
+  .pick .proof-fig.tall { max-width: 260px; }
   .answers { grid-template-columns: minmax(0, 1fr); }
   .proof { padding: 14px; }
   .plate { width: 32px; height: 32px; font-size: 18px; }
@@ -930,18 +933,20 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } c
 const pct = (a, n) => n ? Math.round(a / n * 100) + "%" : "–";
 const aiAd = () => ADS.find(a => a.ai) || ADS[0];
 
+const shape = ad => ad.ratio.split(":")[0] / ad.ratio.split(":")[1];
 function renderDuo() {
+  /* a landscape ad gets a wider column so its small print stays readable */
+  document.getElementById("duo").style.gridTemplateColumns = ADS.map(ad => "minmax(0, " + (shape(ad) > 1.2 ? 1.75 : 1) + "fr)").join(" ");
   document.getElementById("duo").replaceChildren(...ADS.map((ad, i) => {
     const kids = [el("span", { class: "plate", text: ad.plate }),
       ad.src ? el("img", { src: ad.src, alt: "Ad " + ad.plate })
              : el("div", { class: "ph" }, el("div", {}, el("b", { text: ad.plate }), el("span", { class: "spec", text: "Ad " + ad.plate + " goes here" })))];
     if (state.revealed) kids.push(el("div", { class: "stamp" + (ad.ai ? "" : " human"), text: ad.ai ? "AI · CHATGPT" : "HUMAN" }));
     return el("div", { class: "pick rv" + (state.revealed && ad.ai ? " won" : ""), style: "--d:" + (i + 1) },
-      el("figure", { class: "proof-fig" + (ad.ratio.split(":")[0] / ad.ratio.split(":")[1] < 1 ? " tall" : "") },
+      el("figure", { class: "proof-fig" + (shape(ad) < 1 ? " tall" : shape(ad) > 1.2 ? " wide" : "") },
         el("div", { class: "proof", id: "proof-" + ad.plate },
           el("span", { class: "cm tl" }), el("span", { class: "cm tr" }), el("span", { class: "cm bl" }), el("span", { class: "cm br" }),
-          el("div", { class: "ad", style: "aspect-ratio:" + ad.ratio.replace(":", " / ") }, kids)),
-        el("figcaption", { class: "spec", text: [ad.format, ad.ratio, state.revealed ? (ad.ai ? "Made with ChatGPT" : "Made by a person") : "Maker withheld"].join(" · ") })),
+          el("div", { class: "ad", style: "aspect-ratio:" + ad.ratio.replace(":", " / ") }, kids))),
       el("button", { class: "vote", id: "v" + ad.plate, type: "button", "aria-label": "Vote that ad " + ad.plate + " is AI",
         onclick: () => vote(ad.plate) }, el("span", { text: ad.plate + " is AI" }), el("b", { id: "c" + ad.plate, text: String(state[ad.plate]) })));
   }));
