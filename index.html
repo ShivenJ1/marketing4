@@ -622,8 +622,6 @@ table.grid td.n span { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
     <div class="rv">
       <p class="spec">Vote on your phone</p>
       <h2 id="scan-h">Scan to vote.</h2>
-      <p class="lead">Point your camera at the code. It opens this site right at the vote.</p>
-      <p class="scan-url" id="scanUrl"></p>
     </div>
     <figure class="qr-card rv" style="--d:1">
       <div class="qr" id="qr" role="img" aria-label="QR code that opens the vote"></div>
@@ -1069,8 +1067,7 @@ async function connect() {
    The code is built from this page's own address, minus any ?host= password, and lands on the vote. */
 function renderQR() {
   const url = location.origin + location.pathname.replace(/index\.html$/, "") + "#test";
-  const label = document.getElementById("scanUrl"), box = document.getElementById("qr");
-  label.textContent = url.replace(/^https?:\/\//, "").replace(/\/?#test$/, "");
+  const box = document.getElementById("qr");
   if (typeof window.qrcode !== "function") return;
   const q = window.qrcode(0, "M"); q.addData(url); q.make();
   box.innerHTML = q.createSvgTag({ cellSize: 8, margin: 0, scalable: true });
