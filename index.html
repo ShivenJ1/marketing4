@@ -662,7 +662,8 @@ const CHANNELS = [
     automates: ["Writing first drafts of advertisements and product descriptions", "Creating different headlines and captions for the same advertisement", "Improving existing writing by making it shorter, clearer, or more persuasive"],
     human: ["Deciding what the advertisement should communicate to customers", "Choosing the creative direction and the best advertising ideas", "Checking for mistakes and approving the final advertisement"] },
   { id: "search", name: "AI search", stage: "Consideration", owner: "Emiliano",
-    automates: ["Answers that replace clicks", "Comparisons", "Keyword research"], human: ["Reputation", "Trust", "Original expertise"] },
+    automates: ["Organizing customer search questions into topics, like price, features, or product quality", "Writing draft answers to common customer questions for a company's website", "Summarizing what customers search for and how competing companies promote their products"],
+    human: ["Deciding how to improve search visibility", "Checking product information for accuracy", "Making sure the company provides accurate and trustworthy information to customers"] },
   { id: "paid", name: "Paid performance", stage: "Conversion", owner: "Shiven",
     automates: ["Bidding", "Targeting", "Variant testing"], human: ["Budget strategy", "Deciding milestones", "Talks with partners and setting rates"] },
   { id: "email", name: "Email & personalization", stage: "Retention", owner: "Lee",
@@ -702,6 +703,28 @@ Object.assign(CHANNELS.find(c => c.id === "content").deep, {
     { step: "Review how the content performs and identify improvements", tag: "AI-assisted" }
   ],
   consequence: "By 2030, companies may need fewer people for basic writing tasks. Entry-level copywriters could have fewer opportunities to gain experience as more of their work shifts toward editing and improving AI-generated content."
+});
+Object.assign(CHANNELS.find(c => c.id === "search").deep, {
+  note: "Helping customers discover a company through search engines like Google and AI-generated answers from tools like ChatGPT.",
+  purpose: [],
+  roles: [
+    { t: "SEO specialist", d: "Researches what customers search for and works to improve a company's visibility in unpaid Google search results through its content and website." },
+    { t: "GEO strategist (emerging role)", d: "Studies how a company appears in AI-generated answers and recommends ways to make its information more useful, accurate, and easier to discover." }
+  ],
+  workflow: [
+    { step: "Research what customers search for and ask AI tools", tag: "AI-assisted" },
+    { step: "Check how the company appears in Google results and AI answers", tag: "Human-led" },
+    { step: "Identify what product information needs improvement", tag: "Human-led" },
+    { step: "Draft clearer product information and answers to common questions", tag: "AI-assisted" },
+    { step: "Verify the information, make improvements, and monitor results", tag: "Human-led" }
+  ],
+  tested: [
+    { k: "The task:", v: "We asked ChatGPT to recommend three wireless earbuds under $150 for college students." },
+    { k: "What AI produced:", v: "It recommended three products, compared their features and prices, and selected an overall winner." },
+    { k: "What a human had to check:", v: "We compared its claims with official product information and found an error. ChatGPT said the Soundcore Sport X20 didn't support multipoint connectivity, but the manufacturer confirmed it does." },
+    { k: "What we learned:", v: "AI can help customers compare products quickly, but marketers still need to monitor how their products are described and identify inaccurate information." }
+  ],
+  consequence: "AI can answer customers' questions without requiring them to visit a company's website. This could reduce website traffic and force SEO specialists to learn new skills as companies place more importance on appearing in AI-generated answers. AI could also provide outdated or false information."
 });
 Object.assign(CHANNELS.find(c => c.id === "paid").deep, {
   note: "Performance-based and incentive-based. It is made to give gains or rewards tied to milestones, goals and achievements that are established and measured:",
@@ -812,7 +835,7 @@ function channel(c, i) {
         ? el("ol", { class: "flow" }, d.workflow.map(x => el("li", {}, el("span", { class: "st" },
             el("span", { class: "fs", text: x.step }), el("span", { class: "ft" + tagCls(x.tag), text: x.tag || "Untagged" })))))
         : txt(d.workflow)),
-      d.noTest ? null : row("We tested it", txt(d.tested)),
+      d.noTest ? null : row("We tested it", Array.isArray(d.tested) ? el("div", {}, d.tested.map(x => el("p", {}, el("b", { text: x.k + " " }), x.v))) : txt(d.tested)),
       row("Unintended consequence", txt(d.consequence))));
 }
 
